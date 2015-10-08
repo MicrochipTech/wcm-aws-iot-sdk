@@ -1,0 +1,48 @@
+menu "Debug"
+    ---help---
+    IDH_HTML_Debug_System_Service_Library
+    ---endhelp---
+
+config USE_SYS_DEBUG_NEEDED
+    bool
+
+config USE_SYS_DEBUG
+    bool "Use Debug System Service?"
+    select USE_SYS_CONSOLE_NEEDED
+    default n if !USE_SYS_DEBUG_NEEDED
+    default y if USE_SYS_DEBUG_NEEDED
+    ---help---
+    IDH_HTML_Debug_System_Service_Library
+    ---endhelp---
+
+config SYS_ERR_LEVEL
+    depends on USE_SYS_DEBUG
+    string "System Error Level"
+    range SYS_ERROR_LEVEL
+    default "SYS_ERROR_FATAL"
+    ---help---
+    IDH_HTML_SYS_ERROR_LEVEL
+    ---endhelp---
+
+config DEBUG_PRINT_BUFFER_SIZE
+	int "Debug Print Buffer Size (128-1024)"
+	depends on USE_SYS_DEBUG
+	default 512
+	range 128 1024
+    ---help---
+      IDH_HTML_SYS_DEBUG_Configuring_the_Library
+    ---endhelp---
+	
+endmenu
+
+enum SYS_ERROR_LEVEL
+    "SYS_ERROR_FATAL"
+    || "SYS_ERROR_ERROR"
+    || "SYS_ERROR_WARNING"
+    || "SYS_ERROR_INFO"
+    || "SYS_ERROR_DEBUG"
+
+ifblock USE_SYS_DEBUG
+file SYS_DEBUG_H "$HARMONY_VERSION_PATH/framework/system/debug/sys_debug.h" to "$PROJECT_HEADER_FILES/framework/system/debug/sys_debug.h"
+file SYS_DEBUG_C "$HARMONY_VERSION_PATH/framework/system/debug/src/sys_debug.c" to "$PROJECT_SOURCE_FILES/framework/system/debug/src/sys_debug.c"
+endif

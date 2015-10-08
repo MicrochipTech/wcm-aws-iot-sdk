@@ -1,0 +1,16 @@
+menu "WDT"
+    depends on HAVE_WDT
+	
+config USE_SYS_WDT
+    bool "Use Watchdog System Service?"
+    default n
+    ---help---
+      IDH_HTML_Watchdog_Timer__WDT__System_Service_Library
+    ---endhelp---
+endmenu
+
+ifblock USE_SYS_WDT
+file SYS_WDT_H "$HARMONY_VERSION_PATH/framework/system/wdt/sys_wdt.h" to "$PROJECT_HEADER_FILES/framework/system/wdt/sys_wdt.h"
+file SYS_WDT_LOCAL_H "$HARMONY_VERSION_PATH/framework/system/wdt/src/sys_wdt_local.h" to "$PROJECT_HEADER_FILES/framework/system/wdt/src/sys_wdt_local.h"
+file SYS_WDT_C "$HARMONY_VERSION_PATH/framework/system/wdt/src/sys_wdt.c" to "$PROJECT_SOURCE_FILES/framework/system/wdt/src/sys_wdt.c"
+endif

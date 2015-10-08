@@ -1,0 +1,531 @@
+menu "USB Library"
+depends on HAVE_USB || HAVE_USBHS
+
+config USE_USB_STACK_NEEDED
+    bool
+
+config DRV_USB_DEVICE_SUPPORT_NEEDED
+    bool
+
+config USB_DEVICE_USE_HID_NEEDED
+    bool
+
+config USB_DEVICE_USE_CDC_NEEDED
+    bool
+
+config USB_DEVICE_USE_MSD_NEEDED
+    bool
+
+config USB_DEVICE_USE_AUDIO_NEEDED
+    bool
+	
+config USB_DEVICE_USE_AUDIO_2_0_NEEDED
+    bool
+
+config USE_USB_STACK
+    bool "Use USB Stack?"
+    default n if !USE_USB_STACK_NEEDED
+    default y if USE_USB_STACK_NEEDED
+    select USE_SYS_INT_NEEDED
+    select USE_SYS_TMR_NEEDED if PIC32MZ
+    select USE_DRV_TMR_NEEDED if PIC32MZ
+    ---help---
+    IDH_HTML_USB_Library_Help
+    ---endhelp---
+
+menu "RTOS Configuration"
+    depends on USE_USB_STACK
+    depends on USE_3RDPARTY_RTOS
+
+config USB_RTOS
+    string "Run Library Tasks As"
+    range 3RDPARTY_RTOS_SYS_TASKS_OPTIONS
+    default "Standalone"
+
+config USB_RTOS_TASK_SIZE
+    int "Task Size"
+    depends on USB_RTOS = "Standalone"
+    default 1024
+
+config USB_RTOS_TASK_PRIORITY
+    int "Task Priority"
+    depends on USB_RTOS = "Standalone"
+    default 1
+
+config USB_RTOS_USE_DELAY
+    bool "Use Task Delay?"
+    depends on USB_RTOS = "Standalone"
+    default y
+
+config USB_RTOS_DELAY
+    int "Task Delay"
+    depends on USB_RTOS = "Standalone"
+    depends on USB_RTOS_USE_DELAY
+    default 1000
+endmenu
+
+config DRV_USB_DRIVER_MODE
+    string "USB Driver Implementation"
+    depends on USE_USB_STACK && PIC32MX
+    range DRV_USB_MODE
+    default "DYNAMIC"
+    ---help---
+	IDH_HTML_USB_Driver_Library
+    ---endhelp---
+	
+config DRV_USB_INTERRUPT_MODE
+    bool "Interrupt Mode"
+    depends on USE_USB_STACK
+    default y
+    ---help---
+    IDH_HTML_USB_Driver_Library
+    ---endhelp---
+	
+choice
+    prompt "Select Host or Device Stack"
+    depends on USE_USB_STACK
+    default DRV_USB_DEVICE_SUPPORT
+    default DRV_USB_DEVICE_SUPPORT if DRV_USB_DEVICE_SUPPORT_NEEDED
+
+config DRV_USB_DEVICE_SUPPORT
+    bool "USB Device"
+    depends on USE_USB_STACK
+    ---help---
+    IDH_HTML_USB_Device_Library
+    ---endhelp---
+	
+config DRV_USB_HOST_SUPPORT
+    bool "USB Host"
+    depends on USE_USB_STACK
+    select USE_SYS_TMR_NEEDED
+    ---help---
+    Selecting this will include Harmony USB Host stack into the project.
+    ---endhelp---
+endchoice
+	
+	
+config DRV_USB_ENDPOINTS_NUMBER
+    int "Number of Endpoints Used"
+    depends on USE_USB_STACK
+	depends on DRV_USB_DEVICE_SUPPORT
+    default 3 if USE_SYS_CONSOLE
+    default 1
+    ---help---
+    IDH_HTML_USB_DEVLAYER_Library_Configuration 
+    ---endhelp---
+
+
+config DRV_USB_INSTANCES_NUMBER
+    int 
+    depends on USE_USB_STACK
+	depends on DRV_USB_DEVICE_SUPPORT
+    range 1 USBHS_NUMBER_OF_MODULES if PIC32MZ
+    range 1 USB_NUMBER_OF_MODULES if PIC32MX
+    default 1
+
+    ---help---
+    Enter the number of USB Driver instance required in the application.  This
+    value should be atleast 1. In case of PIC32 devices that feature multiple USB
+    peripherals, this value can be greater than 1, thus allowing operation of
+    multiple instances of USB Host Stack or USB Device Stack.
+ 
+    ---endhelp---
+	
+	
+config USB_DEVICE_EP0_BUFFER_SIZE
+    string "Endpoint 0 Buffer Size"
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    range USB_DEVICE_EP0_SIZE
+    default "64"
+    ---help---
+    IDH_HTML_USB_DEVICE_EP0_BUFFER_SIZE
+    ---endhelp---
+
+config USB_DEVICE_INSTANCES_NUMBER
+    int 
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    default 1
+    ---help---
+    IDH_HTML_USB_DEVICE_INSTANCES_NUMBER
+    ---endhelp---
+
+source "$HARMONY_VERSION_PATH/framework/usb/config/usb_device_idx.ftl" 1 instances
+
+config USB_DEVICE_USE_VENDOR_NEEDED
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    bool
+config USB_DEVICE_USE_ENDPOINT_FUNCTIONS
+    bool
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    default n if !USB_DEVICE_USE_VENDOR_NEEDED
+    default y if USB_DEVICE_USE_VENDOR_NEEDED
+    ---help---
+    Select this if USB Device Layer Endpoint Management and data transfer
+    routines are required to be added to the project. This is required if a Vendor
+    USB Device is to be implemented.
+    ---endhelp---
+
+config USB_DEVICE_SOF_EVENT_ENABLE
+    bool "Enable SOF Events"
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    default n
+    ---help---
+    IDH_HTML_USB_DEVICE_SOF_EVENT_ENABLE
+    ---endhelp---
+
+config USB_DEVICE_SET_DESCRIPTOR_EVENT_ENABLE
+    bool "Enable Set Descriptor Events"
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    default n
+    ---help---
+    IDH_HTML_USB_DEVICE_SET_DESCRIPTOR_EVENT_ENABLE
+    ---endhelp---
+
+config USB_DEVICE_SYNCH_FRAME_EVENT_ENABLE
+    bool "Enable Synch Frame Events"
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    default n
+    ---help---
+    IDH_HTML_USB_DEVICE_SYNCH_FRAME_EVENT_ENABLE
+    ---endhelp---
+
+config USB_DEVICE_REMOTE_WAKEUP
+    bool "Use Remote Wakeup Feature"
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    default n
+    ---help---
+    IDH_HTML_USB_DEVICE_RemoteWakeupStart_USB_DEVICE_HANDLE   
+    ---endhelp---
+
+config USB_DEVICE_USE_CDC
+    bool 
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    default n if !USB_DEVICE_USE_CDC_NEEDED
+    default y if USB_DEVICE_USE_CDC_NEEDED
+    ---help---
+    Select this to include the Communications Device Class (CDC) Function Driver
+    Library in the project.  This is required to implement a CDC USB Device
+    (typically virtual COM port USB devices)
+    ---endhelp---
+
+config USB_DEVICE_USE_HID
+    bool 
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    default n if !USB_DEVICE_USE_HID_NEEDED
+    default y if USB_DEVICE_USE_HID_NEEDED
+    ---help---
+    Select this to include the Human Inteface Device (HID) Function Driver
+    Library in the project.  This is required to implement a HID USB Device.
+    ---endhelp---
+
+
+config USB_DEVICE_USE_MSD
+    bool
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+	select DRV_NVM_NEEDED
+    default n if !USB_DEVICE_USE_MSD_NEEDED
+    default y if USB_DEVICE_USE_MSD_NEEDED
+    ---help---
+    Select this to include the Mass Storage Device (MSD) Function Driver
+    Library in the project.  This is required to implement a MSD USB Device.
+    ---endhelp---
+
+config USB_DEVICE_USE_AUDIO
+    bool 
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    default n if !USB_DEVICE_USE_AUDIO_NEEDED
+    default y if USB_DEVICE_USE_AUDIO_NEEDED
+    ---help---
+    Select this to include the Audio Function Driver Library in the project.
+    This is required to implement an Audio USB Device.
+    ---endhelp---
+	
+config USB_DEVICE_USE_AUDIO_2_0
+    bool 
+    depends on USE_USB_STACK
+    depends on DRV_USB_DEVICE_SUPPORT
+    default n if !USB_DEVICE_USE_AUDIO_2_0_NEEDED
+    default y if USB_DEVICE_USE_AUDIO_2_0_NEEDED
+    ---help---
+    Select this to include the Audio Function Driver Library in the project.
+    This is required to implement an Audio USB Device.
+    ---endhelp---
+
+config DRV_USB_HOST_PIPES_NUMBER
+    int "Number of Pipes"
+    depends on USE_USB_STACK
+    depends on DRV_USB_HOST_SUPPORT
+    default 4
+    ---help---
+    Enter the total number of pipes to be provisioned across all instances of USB
+    Host stack. This depends on the number of Host Stack instances, number of
+    devices to be supported and the type of devices to be be supported. The CDC
+    Class Driver creates 4 pipes per attached CDC device. The MSD Class Driver
+    creates 3 pipes per attached MSD devices. Each Host Stack Instance requires one
+    control pipe. Example: In a single Host Stack instance application with support
+    for 1 device (a composite CDC or MSD device), the total number
+    of pipes in the system should be  8 (1 + 4 + 3)
+    ---endhelp---
+	
+config DRV_USB_HOST_NAK_LIMIT
+    int "NAK Timeout"
+    depends on USE_USB_STACK
+    depends on DRV_USB_HOST_SUPPORT
+    default 200	
+    ---help---
+    Enter the maximum number of NAKs before a control transfer times out.
+    Typical value is 200. Some USB devices may require more time to complete control
+    transfers. The Host counts the number of data stage or status stage transactions
+    that were NACked against the NAK limit before concluding that the control
+    transfer must be terminated.
+    ---endhelp---
+config USB_HOST_INSTANCES_NUMBER
+    int 
+    depends on USE_USB_STACK
+    depends on DRV_USB_HOST_SUPPORT
+    range 1 1
+    default 1
+    ---help---
+    Enter the number of USB Host Stack instances required in the application.
+    In case of PIC32 microcontrollers with one USB peripheral, this number will be
+    1. In case of PIC32 microcontrollers with multiple USB peripherals, this number
+    should be set to the number of required USB Host Stack instances . This number
+    should be atleast 1 if USB Host Stack functionality is required.
+    ---endhelp---
+
+
+	
+ifblock (USB_HOST_INSTANCES_NUMBER = 1) 
+config USB_HOST_INSTANCE_0
+    depends on USE_USB_STACK
+    depends on DRV_USB_HOST_SUPPORT
+    bool "USB Host Instance "
+    default y
+	---help---
+    Selecting this will include Harmony USB Host stack into the project.
+    ---endhelp---
+
+source "$HARMONY_VERSION_PATH/framework/usb/config/usb_host_idx0.hconfig"
+	
+config USB_HOST_USE_CDC
+    bool " Use CDC Host Driver "
+    depends on USE_USB_STACK
+    depends on DRV_USB_HOST_SUPPORT
+    default n
+    ---help---
+    Selecting this will include CDC Class Driver Libary into the project.
+    ---endhelp---
+
+
+config USB_HOST_CDC_NUMBER_OF_INSTANCES
+    int "Number of CDC host Driver Instances"
+    depends on USE_USB_STACK
+    depends on DRV_USB_HOST_SUPPORT
+    depends on USB_HOST_USE_CDC
+    default 1
+    ---help---
+    Enter the number of CDC Class Driver instances required in the application.
+    ---endhelp---
+
+config USB_HOST_USE_HID
+    bool " Use HID Host Driver "
+    depends on USE_USB_STACK
+    depends on DRV_USB_HOST_SUPPORT
+    default n
+    ---help---
+    Selecting this will include HID Class Driver Library into the project.
+    ---endhelp---
+
+
+config USB_HOST_HID_NUMBER_OF_INSTANCES
+    int "Number of HID host Driver Instances"
+    depends on USE_USB_STACK
+    depends on DRV_USB_HOST_SUPPORT
+    depends on USB_HOST_USE_HID
+    default 1
+    ---help---
+    Enter the number of HID Class Driver instances required in the application.
+    ---endhelp---
+
+config USB_HOST_USE_MSD
+    bool " Use MSD Host Driver"
+    depends on USE_USB_STACK
+    depends on DRV_USB_HOST_SUPPORT
+    default y
+    ---help---
+    Selecting this will include MSD Class Driver Libary into the project.
+    ---endhelp---
+
+config USB_HOST_MSD_SELECT_FS
+		bool
+    depends on USE_USB_STACK
+        depends on DRV_USB_HOST_SUPPORT
+		depends on USB_HOST_USE_MSD
+		select USE_SYS_FS_NEEDED
+		default y 
+	
+config USB_HOST_MSD_NUMBER_OF_INSTANCES
+    int "Number of MSD host Driver Instances"
+    depends on USB_HOST_USE_MSD
+    depends on USE_USB_STACK
+        depends on DRV_USB_HOST_SUPPORT
+	
+    default 1
+    ---help---
+    Enter the number of MSD Class Driver instances required in the application.
+    ---endhelp---
+
+endif
+
+endmenu
+
+enum DRV_USB_MODE
+    "STATIC"
+    || "DYNAMIC"
+
+enum USB_FUNCTION_DRIVER
+     "AUDIO"
+	 ||"AUDIO_2_0"
+     ||"CDC"
+     ||"HID"
+     ||"MSD"
+     ||"VENDOR"
+
+enum USB_DEVICE_SPEED_FS
+     "USB_SPEED_LOW"
+     ||"USB_SPEED_FULL"
+	 
+enum USB_DEVICE_SPEED_HS
+     "USB_SPEED_LOW"
+     ||"USB_SPEED_FULL"
+     ||"USB_SPEED_HIGH"
+
+enum USB_DEVICE_FUNCTION_SPEED_FS
+     "USB_SPEED_LOW"
+     ||"USB_SPEED_FULL"
+	 
+enum USB_DEVICE_FUNCTION_SPEED_HS
+     "USB_SPEED_LOW"
+     ||"USB_SPEED_FULL"
+     ||"USB_SPEED_HIGH"
+     ||"USB_SPEED_HIGH|USB_SPEED_FULL"
+
+enum USB_DEVICE_EP0_SIZE
+       "64"
+       ||"32"
+       ||"16"
+       ||"8"
+
+ifblock USE_USB_STACK
+    file DRV_USB_H "$HARMONY_VERSION_PATH/framework/driver/usb/drv_usb.h" to "$PROJECT_HEADER_FILES/framework/driver/usb/drv_usb.h"
+    file DRV_USB_HS_C "$HARMONY_VERSION_PATH/framework/driver/usb/usbhs/src/dynamic/drv_usb.c" to "$PROJECT_SOURCE_FILES/framework/driver/usb/usbhs/src/dynamic/drv_usb.c" if PIC32MZ
+	ifblock DRV_USB_DRIVER_MODE = "DYNAMIC"
+    file DRV_USB_FS_DYNAMIC_C "$HARMONY_VERSION_PATH/framework/driver/usb/usbfs/src/dynamic/drv_usb.c" to "$PROJECT_SOURCE_FILES/framework/driver/usb/usbfs/src/dynamic/drv_usb.c" if PIC32MX
+	endif 
+	ifblock  DRV_USB_DRIVER_MODE = "STATIC"
+	file DRV_USB_FS_STATIC_C "$HARMONY_VERSION_PATH/framework/driver/usb/usbfs/src/static/drv_usb.c" to "$PROJECT_SOURCE_FILES/framework/driver/usb/usbfs/src/static/drv_usb.c" if PIC32MX
+	endif
+endif
+
+ifblock DRV_USB_DEVICE_SUPPORT
+    file USB_DEVICE_H "$HARMONY_VERSION_PATH/framework/usb/usb_device.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_device.h"
+    file USB_DEVICE_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device.c"
+    file DRV_USB_DEVICE_HS_C "$HARMONY_VERSION_PATH/framework/driver/usb/usbhs/src/dynamic/drv_usb_device.c" to "$PROJECT_SOURCE_FILES/framework/driver/usb/usbhs/src/dynamic/drv_usb_device.c" if PIC32MZ
+	ifblock DRV_USB_DRIVER_MODE = "DYNAMIC"
+    file DRV_USB_DEVICE_FS_DYNAMIC_C "$HARMONY_VERSION_PATH/framework/driver/usb/usbfs/src/dynamic/drv_usb_device.c" to "$PROJECT_SOURCE_FILES/framework/driver/usb/usbfs/src/dynamic/drv_usb_device.c" if PIC32MX
+	endif 
+	ifblock DRV_USB_DRIVER_MODE = "STATIC"
+    file DRV_USB_DEVICE_FS_STATIC_C "$HARMONY_VERSION_PATH/framework/driver/usb/usbfs/src/static/drv_usb_device.c" to "$PROJECT_SOURCE_FILES/framework/driver/usb/usbfs/src/static/drv_usb_device.c" if PIC32MX
+	endif
+
+    ifblock USB_DEVICE_USE_CDC
+        file USB_CDC_H "$HARMONY_VERSION_PATH/framework/usb/usb_cdc.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_cdc.h"
+        file USB_DEVICE_CDC_H "$HARMONY_VERSION_PATH/framework/usb/usb_device_cdc.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_device_cdc.h"
+        file USB_DEVICE_CDC_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device_cdc.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device_cdc.c"
+        file USB_DEVICE_CDC_ACM_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device_cdc_acm.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device_cdc_acm.c"
+    endif
+
+    ifblock USB_DEVICE_USE_AUDIO
+        file USB_AUDIO_V1_0H "$HARMONY_VERSION_PATH/framework/usb/usb_audio_v1_0.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_audio_v1_0.h"
+        file USB_DEVICE_AUDIO_V1_0H "$HARMONY_VERSION_PATH/framework/usb/usb_device_audio_v1_0.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_device_audio_v1_0.h"
+        file USB_DEVICE_AUDIO_V1_0_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device_audio_v1_0.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device_audio_v1_0.c"
+        file USB_DEVICE_AUDIO_READ_WRITE_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device_audio_read_write.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device_audio_read_write.c"
+     endif
+	 
+	ifblock USB_DEVICE_USE_AUDIO_2_0
+        file USB_AUDIO_V2_0H "$HARMONY_VERSION_PATH/framework/usb/usb_audio_v2_0.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_audio_v2_0.h"
+        file USB_DEVICE_AUDIO_V2_0_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device_audio_v2_0.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device_audio_v2_0.c"
+        file USB_DEVICE_AUDIO2_READ_WRITE_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device_audio_read_write.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device_audio_read_write.c"
+     endif
+
+    ifblock USB_DEVICE_USE_HID
+        file USB_HID_H "$HARMONY_VERSION_PATH/framework/usb/usb_hid.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_hid.h"
+        file USB_DEVICE_HID_H "$HARMONY_VERSION_PATH/framework/usb/usb_device_hid.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_device_hid.h"
+        file USB_DEVICE_HID_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device_hid.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device_hid.c"
+     endif
+
+     ifblock USB_DEVICE_USE_MSD
+        file USB_MSD_H "$HARMONY_VERSION_PATH/framework/usb/usb_msd.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_msd.h"
+        file USB_DEVICE_MSD_H "$HARMONY_VERSION_PATH/framework/usb/usb_device_msd.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_device_msd.h"
+        file DRV_NVM_BLOCK_H "$HARMONY_VERSION_PATH/framework/usb/drv_nvm_block.h" to "$PROJECT_HEADER_FILES/framework/usb/drv_nvm_block.h"
+        file USB_DEVICE_MSD_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device_msd.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device_msd.c"
+        file DRV_NVM_BLOCK_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/drv_nvm_block.c" to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/drv_nvm_block.c"
+     endif
+
+     ifblock USB_DEVICE_USE_ENDPOINT_FUNCTIONS
+        file USB_DEVICE_ENDPOINT_FUNCTIONS_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device_endpoint_functions.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device_endpoint_functions.c"
+     endif
+
+    ifblock USB_DEVICE_REMOTE_WAKEUP
+        file USB_DEVICE_REMOTE_WAKEUP_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_device_remote_wakeup.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_device_remote_wakeup.c"
+    endif
+endif
+
+ifblock DRV_USB_HOST_SUPPORT
+    file USB_HOST_H "$HARMONY_VERSION_PATH/framework/usb/usb_host.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_host.h"
+    file USB_HOST_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_host.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_host.c"
+    file DRV_USB_HOST_HS_C "$HARMONY_VERSION_PATH/framework/driver/usb/usbhs/src/dynamic/drv_usb_host.c" to "$PROJECT_SOURCE_FILES/framework/driver/usb/usbhs/src/dynamic/drv_usb_host.c" if PIC32MZ
+	ifblock DRV_USB_DRIVER_MODE = "DYNAMIC"
+    file DRV_USB_HOST_FS_DYNAMIC_C "$HARMONY_VERSION_PATH/framework/driver/usb/usbfs/src/dynamic/drv_usb_host.c" to "$PROJECT_SOURCE_FILES/framework/driver/usb/usbfs/src/dynamic/drv_usb_host.c" if PIC32MX
+	endif 
+	ifblock DRV_USB_DRIVER_MODE = "STATIC"
+    file DRV_USB_HOST_FS_STATIC_C "$HARMONY_VERSION_PATH/framework/driver/usb/usbfs/src/static/drv_usb_host.c" to "$PROJECT_SOURCE_FILES/framework/driver/usb/usbfs/src/static/drv_usb_host.c" if PIC32MX
+	endif 
+	
+endif
+
+ifblock USB_HOST_USE_CDC
+    file USB_HOST_CDC_H "$HARMONY_VERSION_PATH/framework/usb/usb_host_cdc.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_host_cdc.h"
+    file USB_HOST_CDC_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_host_cdc.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_host_cdc.c"
+   
+endif
+
+ifblock USB_HOST_USE_HID
+    file USB_HOST_HID_H "$HARMONY_VERSION_PATH/framework/usb/usb_host_hid.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_host_hid.h"
+    file USB_HOST_HID_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_host_hid.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_host_hid.c"
+   
+endif
+
+ifblock USB_HOST_USE_MSD
+    file USB_HOST_MSD_H "$HARMONY_VERSION_PATH/framework/usb/usb_host_msd.h" to "$PROJECT_HEADER_FILES/framework/usb/usb_host_msd.h"
+    file USB_HOST_MSD_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_host_msd.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_host_msd.c"
+	file USB_HOST_SCSI_C "$HARMONY_VERSION_PATH/framework/usb/src/dynamic/usb_host_scsi.c"  to "$PROJECT_SOURCE_FILES/framework/usb/src/dynamic/usb_host_scsi.c"
+   
+endif
+
+
+
+
+

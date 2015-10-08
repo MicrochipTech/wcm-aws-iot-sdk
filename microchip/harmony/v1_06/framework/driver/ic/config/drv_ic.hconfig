@@ -1,0 +1,67 @@
+menu "IC"
+    depends on HAVE_IC
+
+enum DRV_IC_MODE
+    "STATIC"
+    
+config USE_DRV_IC
+    bool "Use IC Driver?"
+    select DRIVER
+    default n
+    ---help---
+    IDH_HTML_Input_Capture_Peripheral_Library
+    ---endhelp---
+
+config DRV_IC_DRIVER_MODE
+    string "Driver Implementation"
+    depends on USE_DRV_IC
+    range DRV_IC_MODE
+    default "STATIC"
+    persistent
+    ---help---
+    IDH_HTML_Input_Capture_Peripheral_Library
+    ---endhelp---
+    
+config DRV_IC_INTERRUPT_MODE
+    bool "Interrupt Mode"
+    depends on USE_DRV_IC
+    default n
+    ---help---
+    Checking this option would enable interrupt mode of the module and place necessary calls in the driver.
+    ---endhelp---
+
+config DRV_IC_INCLUDE_INTERRUPT_SERVICE
+    bool
+    depends on USE_DRV_IC
+    depends on DRV_IC_DRIVER_MODE = "STATIC"
+    depends on DRV_IC_INTERRUPT_MODE
+    select USE_SYS_INT_NEEDED
+    default y
+    
+config DRV_IC_INSTANCES_NUMBER
+    int "Number of IC Driver Instances"
+    depends on USE_DRV_IC
+    range 1 IC_NUMBER_OF_MODULES
+    default 1
+    ---help---
+    Sets up the maximum number of hardware instances that can be supported. 
+    ---endhelp---
+
+source "$HARMONY_VERSION_PATH/framework/driver/ic/config/drv_ic_idx.ftl" 9 instances
+
+config DRV_IC_INCLUDE_TIMER
+    bool
+    depends on USE_DRV_IC
+    select USE_DRV_TMR_NEEDED
+    default y
+    select USE_TMR_DRIVER_MODE_NEEDED_BY_IC_OC
+    default y
+
+endmenu
+
+
+ifblock USE_DRV_IC
+template IC_STATIC_DRV_C "$HARMONY_VERSION_PATH/framework/driver/ic/templates/drv_ic_static.c.ftl" to "$PROJECT_SOURCE_FILES/app/system_config/$CONFIGURATION/framework/driver/ic/src/drv_ic_static.c"
+template IC_STATIC_DRV_H "$HARMONY_VERSION_PATH/framework/driver/ic/templates/drv_ic_static.h.ftl" to "$PROJECT_HEADER_FILES/app/system_config/$CONFIGURATION/framework/driver/ic/drv_ic_static.h"
+endif
+

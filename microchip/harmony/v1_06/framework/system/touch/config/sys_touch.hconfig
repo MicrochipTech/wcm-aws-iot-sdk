@@ -1,0 +1,61 @@
+menu "Touch"
+
+config USE_SYS_TOUCH_NEEDED
+    bool
+
+config USE_SYS_TOUCH
+bool "Use Touch System Service?"
+    default n if !USE_SYS_TOUCH_NEEDED
+    default y if USE_SYS_TOUCH_NEEDED
+    select USE_SYS_MSG_NEEDED
+    select USE_DRV_TOUCH_ADC10BIT if USE_GFX_TRULY_32_240X320 || USE_GFX_POWERTIP_43_480X272 || USE_GFX_TRULY_57_640X480 || USE_GFX_TRULY_7_800X480
+    select USE_DRV_TOUCH_MTCH6301 if USE_GFX_NEWHAVEN_43_480X272_PCAP || USE_GFX_NEWHAVEN_50_800X480_PCAP
+    ---help---
+    IDH_HTML_Touch_System_Service_Library
+    ---endhelp---
+
+config USE_SYS_TOUCH_CALIBRATION
+    depends on USE_SYS_TOUCH
+    bool
+    default n    
+	
+menu "RTOS Configuration"
+    depends on USE_SYS_TOUCH
+    depends on USE_3RDPARTY_RTOS
+
+config SYS_TOUCH_RTOS
+    string "Run Library Tasks As"
+    range 3RDPARTY_RTOS_SYS_TASKS_OPTIONS
+    default "Combined with System Tasks"
+
+config SYS_TOUCH_RTOS_TASK_SIZE
+    int "Task Size"
+    depends on SYS_TOUCH_RTOS = "Standalone"
+    default 1024
+
+config SYS_TOUCH_RTOS_TASK_PRIORITY
+    int "Task Priority"
+    depends on SYS_TOUCH_RTOS = "Standalone"
+    default 1
+
+config SYS_TOUCH_RTOS_USE_DELAY
+    bool "Use Task Delay?"
+    depends on SYS_TOUCH_RTOS = "Standalone"
+    default y
+
+config SYS_TOUCH_RTOS_DELAY
+    int "Task Delay"
+    depends on SYS_TOUCH_RTOS = "Standalone"
+    depends on SYS_TOUCH_RTOS_USE_DELAY
+    default 1000
+
+endmenu
+
+endmenu
+
+ifblock USE_SYS_TOUCH
+
+file SYS_TOUCH_H "$HARMONY_VERSION_PATH/framework/system/touch/sys_touch.h" to "$PROJECT_HEADER_FILES/framework/system/touch/sys_touch.h"
+file SYS_TOUCH_C "$HARMONY_VERSION_PATH/framework/system/touch/src/sys_touch.c" to "$PROJECT_SOURCE_FILES/framework/system/touch/src/sys_touch.c"
+
+endif

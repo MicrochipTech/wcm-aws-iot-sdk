@@ -1,0 +1,114 @@
+menu "Message"
+
+config USE_SYS_MSG_NEEDED
+        bool
+
+config USE_SYS_MSG
+    bool "Use Message System Service?"
+    default n if !USE_SYS_MSG_NEEDED
+    default y if USE_SYS_MSG_NEEDED
+    ---help---
+    IDH_HTML_Messaging_System_Service_Library
+    ---endhelp---
+
+config SYS_MSG_MAX_MAILBOXES
+    int "Maximum Number Message Mailboxes"
+    depends on USE_SYS_MSG
+    default 2
+    ---help---
+    IDH_HTML_SYS_MSG_MAX_MAILBOXES
+    ---endhelp---
+
+config SYS_MSG_MAX_TYPES
+    int "Maximum Number Of Messages Types"
+    depends on USE_SYS_MSG
+    default 2
+    ---help---
+    IDH_HTML_SYS_MSG_MAX_TYPES
+    ---endhelp---
+	
+config SYS_MSG_MAX_MSGS_DELIVERED
+    int "Maximum Number Of Messages Per Task Cycle"
+    depends on USE_SYS_MSG
+    default 1
+    ---help---
+    IDH_HTML_SYS_MSG_INIT
+    ---endhelp---
+
+config SYS_MSG_MAX_PRIORITY
+    int "Maximum Message Priority"
+    depends on USE_SYS_MSG
+    default 1
+	range 0 4
+    ---help---
+    IDH_HTML_SYS_MSG_INIT
+    ---endhelp---
+
+ifblock (SYS_MSG_MAX_PRIORITY = 0) || (SYS_MSG_MAX_PRIORITY = 1) || (SYS_MSG_MAX_PRIORITY = 2) || (SYS_MSG_MAX_PRIORITY = 3) || (SYS_MSG_MAX_PRIORITY = 4)
+config SYS_MSG_BUFFER_SIZES0
+    depends on USE_SYS_MSG
+    int "Priority 0 Message Queue Size"
+    default 64
+    ---help---
+    IDH_HTML_SYS_MSG_INIT
+    ---endhelp---
+endif
+
+ifblock (SYS_MSG_MAX_PRIORITY = 1) || (SYS_MSG_MAX_PRIORITY = 2) || (SYS_MSG_MAX_PRIORITY = 3) || (SYS_MSG_MAX_PRIORITY = 4)
+config SYS_MSG_BUFFER_SIZES1
+    depends on USE_SYS_MSG
+    int "Priority 1 Message Queue Size"
+    default 32
+    ---help---
+    IDH_HTML_SYS_MSG_INIT
+    ---endhelp---
+endif
+
+ifblock (SYS_MSG_MAX_PRIORITY = 2) || (SYS_MSG_MAX_PRIORITY = 3) || (SYS_MSG_MAX_PRIORITY = 4)
+config SYS_MSG_BUFFER_SIZES2
+    depends on USE_SYS_MSG
+    int "Priority 2 Message Queue Size"
+    default 16
+    ---help---
+    IDH_HTML_SYS_MSG_INIT
+    ---endhelp---
+endif
+
+ifblock (SYS_MSG_MAX_PRIORITY = 3) || (SYS_MSG_MAX_PRIORITY = 4)
+config SYS_MSG_BUFFER_SIZES3
+    depends on USE_SYS_MSG
+    int "Priority 3 Message Queue Size"
+    default 8
+    ---help---
+    IDH_HTML_SYS_MSG_INIT
+    ---endhelp---
+endif
+
+ifblock (SYS_MSG_MAX_PRIORITY = 4)
+config SYS_MSG_BUFFER_SIZES4
+    depends on USE_SYS_MSG
+    int "Priority 4 Message Queue Size"
+    default 4
+    ---help---
+    IDH_HTML_SYS_MSG_INIT
+    ---endhelp---
+endif
+
+config SYS_MSG_INSTANCES_NUMBER
+    int "Number Message System Instances"
+    depends on USE_SYS_MSG
+    range 1 5
+    default 1
+    ---help---
+	IDH_HTML_SYS_MSG_INSTANCE
+    ---endhelp---
+
+source "$HARMONY_VERSION_PATH/framework/system/msg/config/sys_msg_idx.ftl" 5 instances
+
+endmenu
+
+
+ifblock USE_SYS_MSG
+file SYS_MSG_H "$HARMONY_VERSION_PATH/framework/system/msg/sys_msg.h"
+file SYS_MSG_C "$HARMONY_VERSION_PATH/framework/system/msg/src/sys_msg.c"
+endif

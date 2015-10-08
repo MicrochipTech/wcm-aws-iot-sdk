@@ -1,0 +1,22 @@
+
+config USE_CRYPTO_RANDOM_NEEDED
+    bool
+
+config USE_CRYPTO_RANDOM
+	bool "Use Random Number Functions?"
+	depends on USE_CRYPTO_LIB
+	default n if !USE_CRYPTO_RANDOM_NEEDED
+	default y if USE_CRYPTO_RANDOM_NEEDED
+	---help---
+	  IDH_HTML_CRYPTO_Library_Interface
+	---endhelp---
+
+ifblock USE_CRYPTO_LIB && USE_CRYPTO_RANDOM && !USE_3RDPARTY_WOLFSSL
+file RANDOM_H "$HARMONY_VERSION_PATH/framework/crypto/src/random.h" to "$PROJECT_HEADER_FILES/framework/crypto/src/random.h"
+file RANDOM_C "$HARMONY_VERSION_PATH/framework/crypto/src/random.c" to "$PROJECT_SOURCE_FILES/framework/crypto/src/random.c"
+endif
+
+ifblock USE_CRYPTO_RANDOM && !USE_CRYPTO_ECC && !USE_3RDPARTY_WOLFSSL
+file CRYPTO_RND_ARC4_H "$HARMONY_VERSION_PATH/framework/crypto/src/arc4.h" to "$PROJECT_HEADER_FILES/framework/crypto/src/arc4.h"
+file CRYPTO_RND_ARC4_C "$HARMONY_VERSION_PATH/framework/crypto/src/arc4.c" to "$PROJECT_SOURCE_FILES/framework/crypto/src/arc4.c"
+endif

@@ -1,0 +1,8 @@
+menu "Math Library"
+
+config MATH
+    bool
+
+source "$HARMONY_VERSION_PATH/framework/math/dsp/config/dsp.hconfig"
+source "$HARMONY_VERSION_PATH/framework/math/libq/config/libq.hconfig"
+endmenu

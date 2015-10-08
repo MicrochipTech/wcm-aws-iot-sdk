@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>E0F527DB-11A9-4652-BE91-898AC1A1CF54</string>
+	<key>IDESourceControlProjectName</key>
+	<string>wolfssl</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>936F1CA25808212AFAE2BC78C711D1407A0FE3B4</key>
+		<string>github.com:wolfSSL/wolfssl.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>IDE/iOS/wolfssl.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>936F1CA25808212AFAE2BC78C711D1407A0FE3B4</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:wolfSSL/wolfssl.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>936F1CA25808212AFAE2BC78C711D1407A0FE3B4</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>936F1CA25808212AFAE2BC78C711D1407A0FE3B4</string>
+			<key>IDESourceControlWCCName</key>
+			<string>wolfssl</string>
+		</dict>
+	</array>
+</dict>
+</plist>

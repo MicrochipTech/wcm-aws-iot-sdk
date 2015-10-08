@@ -1,0 +1,67 @@
+menu "OC"
+    depends on HAVE_OC
+
+enum DRV_OC_MODE
+    "STATIC"
+    
+config USE_DRV_OC
+    bool "Use OC Driver?"
+    select DRIVER
+    default n
+    ---help---
+    IDH_HTML_Output_Compare_Peripheral_Library
+    ---endhelp---
+
+config DRV_OC_DRIVER_MODE
+    string "Driver Implementation"
+    depends on USE_DRV_OC
+    range DRV_OC_MODE
+    default "STATIC"
+    persistent
+    ---help---
+    IDH_HTML_Output_Compare_Peripheral_Library
+    ---endhelp---
+
+config DRV_OC_INTERRUPT_MODE
+    bool "Interrupt Mode"
+    depends on USE_DRV_OC
+    default n
+    ---help---
+    Checking this option would enable interrupt mode of the device and place necessary calls in the driver.
+    ---endhelp---
+
+config DRV_OC_INCLUDE_INTERRUPT_SERVICE
+    bool
+    depends on USE_DRV_OC
+    depends on DRV_OC_DRIVER_MODE = "STATIC"
+    depends on DRV_OC_INTERRUPT_MODE
+    select USE_SYS_INT_NEEDED
+    default y
+    
+config DRV_OC_INSTANCES_NUMBER
+    int "Number of OC Driver Instances"
+    depends on USE_DRV_OC
+    range 1 OC_NUMBER_OF_MODULES
+    default 1
+    ---help---
+    Sets up the maximum number of hardware instances that can be supported. 
+    ---endhelp---
+
+source "$HARMONY_VERSION_PATH/framework/driver/oc/config/drv_oc_idx.ftl" 9 instances
+
+config DRV_OC_INCLUDE_TIMER
+    bool
+    depends on USE_DRV_OC
+    select USE_DRV_TMR_NEEDED
+    default y
+    select USE_TMR_DRIVER_MODE_NEEDED_BY_IC_OC
+    default y
+
+endmenu
+
+ifblock USE_DRV_OC
+template OC_STATIC_DRV_C "$HARMONY_VERSION_PATH/framework/driver/oc/templates/drv_oc_static.c.ftl" to "$PROJECT_SOURCE_FILES/app/system_config/$CONFIGURATION/framework/driver/oc/src/drv_oc_static.c"
+template OC_STATIC_DRV_H "$HARMONY_VERSION_PATH/framework/driver/oc/templates/drv_oc_static.h.ftl" to "$PROJECT_HEADER_FILES/app/system_config/$CONFIGURATION/framework/driver/oc/drv_oc_static.h"
+endif
+
+

@@ -1,0 +1,312 @@
+config DRV_ADC_ID
+    string
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+    range ADC_MODULE_ID
+    default "ADC_ID_1"	
+	
+config DRV_ADC_DRIVER_MODE
+    string "Driver Implementation"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+    range DRV_ADC_MODE_ENUM
+    default "STATIC"
+	persistent
+    ---help---
+    IDH_HTML_ADC_Driver_Library
+    ---endhelp---
+
+config DRV_ADC_INCLUDE_DRIVER
+    bool
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+    depends on DRV_ADC_DRIVER_MODE = "DYNAMIC"
+    select DRIVER
+    default y
+
+choice
+
+    prompt "Mode Options"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+    default DRV_ADC_POLLED_MODE	
+	
+config DRV_ADC_INTERRUPT_MODE
+    bool "Interrupt Mode"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	select USE_SYS_INT_NEEDED
+    ---help---
+    IDH_HTML_DRV_ADC_INTERRUPT_MODE
+    ---endhelp---
+	
+config DRV_ADC_POLLED_MODE
+    bool "Polled Mode"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+    ---help---
+    Sets ADC Static Driver to Polled Mode 
+    ---endhelp---
+
+endchoice	
+
+config DRV_ADC_INTERRUPT_SOURCE
+    string
+    depends on USE_DRV_ADC && DRV_ADC_INTERRUPT_MODE
+    default "INT_SOURCE_ADC_1"
+    ---help---
+      IDH_HTML_INT_SOURCE
+    ---endhelp---
+    
+config DRV_ADC_INTERRUPT_VECTOR
+    string
+    depends on USE_DRV_ADC && DRV_ADC_INTERRUPT_MODE
+    default "INT_VECTOR_AD1"
+    ---help---
+      IDH_HTML_INT_VECTOR
+    ---endhelp---
+    
+config DRV_ADC_INTERRUPT_PRIORITY
+    string "Interrupt Priority"
+    depends on USE_DRV_ADC && DRV_ADC_INTERRUPT_MODE
+    range INT_PRIORITY_LEVEL
+    default "INT_PRIORITY_LEVEL3"
+    ---help---
+      IDH_HTML_INT_PRIORITY_LEVEL
+    ---endhelp---
+    
+config DRV_ADC_INTERRUPT_SUB_PRIORITY
+    string "Interrupt Sub-priority"
+    depends on USE_DRV_ADC && DRV_ADC_INTERRUPT_MODE
+    range INT_SUBPRIORITY_LEVEL
+    default "INT_SUBPRIORITY_LEVEL0"
+    ---help---
+      IDH_HTML_INT_SUBPRIORITY_LEVEL
+    ---endhelp---
+   
+config DRV_ADC_INT_PRIO_NUM
+    string
+    depends on USE_DRV_ADC && DRV_ADC_INTERRUPT_MODE
+    default "INT_DISABLE_INTERRUPT" if DRV_ADC_INTERRUPT_PRIORITY = "INT_DISABLE_INTERRUPT"
+    default "INT_PRIORITY_LEVEL1" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL1"
+    default "INT_PRIORITY_LEVEL2" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL2"
+    default "INT_PRIORITY_LEVEL3" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL3"
+    default "INT_PRIORITY_LEVEL4" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL4"
+    default "INT_PRIORITY_LEVEL5" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL5"
+    default "INT_PRIORITY_LEVEL6" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL6"
+    default "INT_PRIORITY_LEVEL7" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL7"    
+
+config DRV_ADC_INT_IPL
+    string
+    depends on USE_DRV_ADC && DRV_ADC_INTERRUPT_MODE
+    default "0" if DRV_ADC_INTERRUPT_PRIORITY = "INT_DISABLE_INTERRUPT"
+    default "1" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL1"
+    default "2" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL2"
+    default "3" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL3"
+    default "4" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL4"
+    default "5" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL5"
+    default "6" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL6"
+    default "7" if DRV_ADC_INTERRUPT_PRIORITY = "INT_PRIORITY_LEVEL7"
+ 
+config DRV_ADC_ISR_VECTOR
+    string
+    depends on USE_DRV_ADC && DRV_ADC_INTERRUPT_MODE
+    default "_ADC_VECTOR" if (DRV_ADC_INTERRUPT_VECTOR = "INT_VECTOR_AD1")
+
+menu "Clock Options"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	
+config DRV_ADC_CLK_SOURCE_SELECT
+    string "Conversion Clock Source (Tpb)"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	range ADC_CLOCK_SOURCE
+    default "ADC_CLOCK_SOURCE_SYSTEM_CLOCK"	
+	---help---
+	IDH_HTML_ADC_CLOCK_SOURCE
+	---endhelp---
+	
+config DRV_ADC_CLK_VALUE_SELECT
+    int "TAD Clock (Tad)"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	default 320000000
+	---help---
+	IDH_HTML_ADC_CONVERSION_CLOCK
+	---endhelp---
+
+endmenu	
+	
+menu "Sampling Options"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	
+config DRV_ADC_AUTO_SAMPLE_EN
+    bool "Enable Auto Sample?"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+    default n
+    ---help---
+    IDH_HTML_PLIB_ADC_SampleAutoStartEnable_ADC_MODULE_ID
+    ---endhelp---
+
+config DRV_ADC_ACQUISITION_TIME
+    int "Auto Sample Time (nTAD)"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC    	
+    depends on DRV_ADC_AUTO_SAMPLE_EN
+	range 0 31
+    default 31
+	---help---
+	IDH_HTML_ADC_ACQUISITION_TIME
+	---endhelp---
+	
+config DRV_ADC_STOP_CONVERSION
+    bool "Stop Conversion on the First ADC Interrupt?"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC    	
+    depends on DRV_ADC_AUTO_SAMPLE_EN
+    default n
+	---help---
+	IDH_HTML_PLIB_ADC_ConversionStopSequenceEnable_ADC_MODULE_ID
+	---endhelp---
+
+config DRV_ADC_ALTS_MODE
+   string "Sampling Mode"
+   depends on USE_DRV_ADC
+   depends on DRV_ADC_TYPE_ADC
+   range ADC_SAMPLING_MODE
+   default "ADC_SAMPLING_MODE_MUXA"
+   ---help---
+   IDH_HTML_ADC_SAMPLING_MODE
+   ---endhelp---
+
+config DRV_ADC_SCAN_MODE
+   bool "Enable Scan Mode?"
+   depends on USE_DRV_ADC
+   depends on DRV_ADC_TYPE_ADC
+   default n
+   ---help---
+   IDH_HTML_PLIB_ADC_MuxAInputScanEnable_ADC_MODULE_ID
+   ---endhelp---
+   
+config DRV_ADC_NUMBER_OF_SAMPLES
+    string "Number of Samples per Interrupt"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	range ADC_SAMPLES_PER_INTERRUPT
+	default "ADC_16SAMPLES_PER_INTERRUPT"
+	---help---
+	IDH_HTML_ADC_SAMPLES_PER_INTERRUPT
+	---endhelp---
+   
+endmenu
+
+menu "Conversion Options"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	
+config DRV_ADC_TRIG_SRC
+    string "Trigger Source"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	range ADC_CONVERSION_TRIGGER_SOURCE
+	default "ADC_CONVERSION_TRIGGER_INTERNAL_COUNT"
+	---help---
+	IDH_HTML_ADC_CONVERSION_TRIGGER_SOURCE
+	---endhelp---
+	
+config DRV_ADC_OUTPUT_FOMRAT
+    string "Data Output Format"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+    range ADC_RESULT_FORMAT
+	default "ADC_RESULT_FORMAT_INTEGER_16BIT"
+    ---help---
+    IDH_HTML_ADC_RESULT_FORMAT
+    ---endhelp---
+	
+config DRV_ADC_BUFFER_RESULT_MODE
+    string "Buffer Result Mode"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	range ADC_BUFFER_MODE
+	default "ADC_BUFFER_MODE_ONE_16WORD_BUFFER"
+	---help---
+	IDH_HTML_ADC_BUFFER_MODE
+	---endhelp---
+
+config DRV_ADC_BUFFER_STATUS
+   bool "Check Buffer Status?"
+   depends on USE_DRV_ADC
+   depends on DRV_ADC_TYPE_ADC
+   depends on DRV_ADC_BUFFER_RESULT_MODE = "ADC_BUFFER_MODE_TWO_8WORD_BUFFERS"
+   default n
+   ---help---
+   IDH_HTML_ADC_ACQUISITION_TIME
+   ---endhelp---
+
+endmenu
+
+menu "Other Options"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	
+config DRV_ADC_VOLTAGE_REFERENCE_ADC
+    string "Select Voltage Reference"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+    range ADC_VOLTAGE_REFERENCE
+    default "ADC_REFERENCE_VDD_TO_AVSS"
+	---help---
+	IDH_HTML_ADC_VOLTAGE_REFERENCE
+	---endhelp---
+	
+config DRV_ADC_OFFSET_CALIBRATION
+    bool "Enable Calibration?"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	default n
+	---help---
+	IDH_HTML_PLIB_ADC_CalibrationEnable_ADC_MODULE_ID
+	---endhelp---
+	
+config DRV_ADC_POWER_STATE
+    string "Power State"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+    range SYS_MODULE_POWER_STATE
+    default "SYS_MODULE_POWER_RUN_FULL"
+    ---help---
+    IDH_HTML_SYS_MODULE_INIT
+    ---endhelp---
+
+endmenu
+	
+menu "Negative Input Options"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	
+config DRV_ADC_MUXA_NEG_INPUT
+    string " MUX A Input"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	range ADC_INPUTS_NEGATIVE
+	default "ADC_INPUT_NEGATIVE_VREF_MINUS"
+	---help---
+	IDH_HTML_ADC_INPUTS_NEGATIVE
+	---endhelp---
+	
+config DRV_ADC_MUXB_NEG_INPUT
+    string " MUX B Input"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADC
+	depends on DRV_ADC_ALTS_MODE = "ADC_SAMPLING_MODE_ALTERNATE_INPUT"
+	range ADC_INPUTS_NEGATIVE
+	default "ADC_INPUT_NEGATIVE_VREF_MINUS"
+	---help---
+	IDH_HTML_ADC_INPUTS_NEGATIVE
+	---endhelp---
+	
+endmenu

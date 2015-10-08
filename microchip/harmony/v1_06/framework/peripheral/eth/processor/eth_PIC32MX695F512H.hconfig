@@ -1,0 +1,14 @@
+#Created by plib_hconfig_gen $Revision: 1.00 
+
+config PIC32MX695F512H_ETH
+	bool
+	select HAVE_ETH
+	default y
+
+config ETH_NUMBER_OF_MODULES
+	int
+	default 1
+
+enum ETH_MODULE_ID exclusive
+	"ETH_ID_0"
+

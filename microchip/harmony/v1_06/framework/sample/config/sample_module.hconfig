@@ -1,0 +1,51 @@
+menu "Sample Module"
+
+config USE_SAMPLE_MODULE
+    bool "Use Sample Module?"
+    default n
+    ---help---
+    IDH_HTML_SAMPLE_Introduction
+    ---endhelp---
+
+config SAMPLE_MODULE_INSTANCES_NUMBER
+    int "Number of sample module instances."
+    depends on USE_SAMPLE_MODULE
+    range 1 2
+    default 1
+    ---help---
+    IDH_HTML_SAMPLE_MODULE_INSTANCES_NUMBER
+    ---endhelp---
+
+comment "Each sample module instance uses a timer when interrupt driven."
+    depends on USE_SAMPLE_MODULE
+
+config SAMPLE_MODULE_INTERRUPT_MODE
+    bool "Build for interrupt-driven mode"
+    depends on USE_SAMPLE_MODULE
+    default n
+    ---help---
+    IDH_HTML_SAMPLE_MODULE_INTERRUPT_MODE
+    ---endhelp---
+    
+config SAMPLE_MODULE_TIMEOUT
+    int "OSAL timeout when running under an RTOS (in ms)."
+    depends on USE_SAMPLE_MODULE
+    default 100
+    ---help---
+    IDH_HTML_SAMPLE_MODULE_TIMEOUT
+    ---endhelp---
+    
+
+source "$HARMONY_VERSION_PATH/framework/sample/config/sample_module_idx.hconfig.ftl" 2 instances
+
+endmenu
+
+
+enum SAMPLE_MODULE_INDEX
+    "SAMPLE_MODULE_INDEX_0"
+    || "SAMPLE_MODULE_INDEX_1"
+
+ifblock USE_SAMPLE_MODULE
+file SAMPLE_MODULE_H "$HARMONY_VERSION_PATH/framework/sample/sample_module.h" to "$PROJECT_HEADER_FILES/framework/sample/sample_module.h"
+file SAMPLE_MODULE_C "$HARMONY_VERSION_PATH/framework/sample/src/sample_module.c"  to "$PROJECT_SOURCE_FILES/framework/sample/src/sample_module.c"
+endif

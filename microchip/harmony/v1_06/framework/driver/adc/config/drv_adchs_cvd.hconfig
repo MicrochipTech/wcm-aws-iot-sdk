@@ -1,0 +1,93 @@
+config DRV_ADCHS_CVD_DIGITAL_COMPARATOR_ID
+    string "Digital Comparator Selection"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADCHS
+	range ADCHS_DIGITAL_COMPARATOR_ID
+    default "ADCHS_DIGITAL_COMPARATOR_1"
+	persistent
+	---help---
+	IDH_HTML_ADCHS_DIGITAL_COMPARATOR_ID
+	---endhelp---
+
+config DRV_ADCHS_CVD_CAPACITOR
+    string "CVD Capacitor Selection"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADCHS
+	range ADCHS_CVD_CAPACITOR
+    default "ADCHS_CVD_CAPACITOR_0PF"
+	---help---
+	IDH_HTML_ADCHS_CVD_CAPACITOR
+	---endhelp---
+
+config DRV_ADCHS_CVD_DIGITAL_COMPARATOR_ANALOG_INPUT_ID
+    string "Analog Input to be processed by CVD (Class-2 and 3 are valid inputs)"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADCHS
+	range ADCHS_AN_INPUT_ID
+    default "ADCHS_AN0"
+	---help---
+	IDH_HTML_ADCHS_CVD_DIGITAL_COMPARATOR_ANALOG_INPUT_ID
+	---endhelp---
+
+config DRV_ADCHS_CVD_DIGITAL_COMPARATOR_HIGH_LIMIT
+    int "High Limit Value"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADCHS
+	default 0
+	---help---
+	IDH_HTML_ADCHS_CVD_DIGITAL_COMPARATOR_HIGH_LIMIT
+	---endhelp---
+
+config DRV_ADCHS_CVD_DIGITAL_COMPARATOR_LOW_LIMIT
+    int "Low Limit Value"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADCHS
+	default 0
+	---help---
+	IDH_HTML_ADCHS_CVD_DIGITAL_COMPARATOR_LOW_LIMIT
+	---endhelp---
+
+config DRV_ADCHS_CVD_DIGITAL_COMPARATOR_BTWN_EVENT
+    bool "Digital Comparator event is generated when CVD result is between High-Limit and Low-Limit"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADCHS
+	default n
+	---help---
+	IDH_HTML_ADCHS_CVD_DIGITAL_COMPARATOR_BTWN_EVENT
+	---endhelp---
+	
+config DRV_ADCHS_CVD_DIGITAL_COMPARATOR_HI_HI_EVENT
+    bool "Digital Comparator event is generated when CVD result is higher than or equal to High-Limit"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADCHS
+	default n
+	---help---
+	IDH_HTML_ADCHS_CVD_DIGITAL_COMPARATOR_HI_HI_EVENT
+	---endhelp---
+
+config DRV_ADCHS_CVD_DIGITAL_COMPARATOR_HI_LO_EVENT
+    bool "Digital Comparator event is generated when CVD result is lower than High-Limit"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADCHS
+	default n
+	---help---
+	IDH_HTML_ADCHS_CVD_DIGITAL_COMPARATOR_HI_LO_EVENT
+	---endhelp---
+	
+config DRV_ADCHS_CVD_DIGITAL_COMPARATOR_LO_HI_EVENT
+    bool "Digital Comparator event is generated when CVD result is higher or equal to Low-Limit"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADCHS
+	default n
+	---help---
+	IDH_HTML_ADCHS_CVD_DIGITAL_COMPARATOR_LO_HI_EVENT
+	---endhelp---
+
+config DRV_ADCHS_CVD_DIGITAL_COMPARATOR_LO_LO_EVENT
+    bool "Digital Comparator event is generated when CVD result is lower than to Low-Limit"
+    depends on USE_DRV_ADC
+	depends on DRV_ADC_TYPE_ADCHS
+	default n
+	---help---
+	IDH_HTML_ADCHS_CVD_DIGITAL_COMPARATOR_LO_LO_EVENT
+	---endhelp---

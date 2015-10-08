@@ -1,0 +1,15 @@
+config TCPIP_STACK_USE_ICMP_SERVER
+    bool "ICMP Server"
+    depends on USE_TCPIP_STACK
+    depends on TCPIP_STACK_USE_IPV4
+    default n
+    ---help---
+    IDH_HTML_TCPIP_ICMP_Introduction
+    ---endhelp---
+
+
+ifblock TCPIP_STACK_USE_ICMP_SERVER || TCPIP_STACK_USE_ICMP_CLIENT
+file TCPIP_ICMP_H "$HARMONY_VERSION_PATH/framework/tcpip/icmp.h" to "$PROJECT_HEADER_FILES/framework/tcpip/icmp.h"
+file TCPIP_ICMP_C "$HARMONY_VERSION_PATH/framework/tcpip/src/icmp.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/stack/icmp.c"
+file TCPIP_ICMP_MANAGER_H "$HARMONY_VERSION_PATH/framework/tcpip/src/icmp_manager.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/icmp_manager.h"
+endif

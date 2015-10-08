@@ -1,0 +1,1 @@
+source "$HARMONY_VERSION_PATH/framework/peripheral/osc/processor/osc_$DEVICE.hconfig"

@@ -1,0 +1,1 @@
+source "$HARMONY_VERSION_PATH/framework/peripheral/tmr/processor/tmr_$DEVICE.hconfig"

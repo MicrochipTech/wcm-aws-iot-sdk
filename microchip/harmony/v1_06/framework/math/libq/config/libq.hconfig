@@ -1,0 +1,18 @@
+menu "LibQ Fixed-Point Math Library Configuration"
+    depends on !PIC32MX
+    
+config USE_LIBQ
+    bool "Use LibQ Fixed-Point Math Library?"
+    depends on !PIC32MX
+    default n
+    ---help---
+    IDH_HTML_DSP_LibQ_Fixed_Point_Library
+    ---endhelp---
+
+endmenu
+
+
+ifblock USE_LIBQ
+library LIBQ_A "$HARMONY_VERSION_PATH/bin/framework/math/libq/LIBQ_Library.X.a"
+file LIBQ_H "$HARMONY_VERSION_PATH/framework/math/libq/libq.h" to "$PROJECT_HEADER_FILES/framework/math/libq/libq.h"
+endif

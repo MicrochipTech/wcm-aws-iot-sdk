@@ -1,0 +1,30 @@
+menu "DSP Fixed-Point Math Library Configuration"
+    
+config USE_DSP
+    bool "Use DSP Fixed-Point Math Library?"
+    default n
+    ---help---
+    IDH_HTML_DSP_Fixed_Point_Library
+    ---endhelp---
+
+config USE_DSP_EXCEPTION
+    depends on USE_DSP
+    bool "Use Exception Handling?"
+    default n
+    ---help---
+    IDH_HTML_DSP_Fixed_Point_Library
+    ---endhelp---
+
+
+##########################################################################
+
+endmenu
+ifblock USE_DSP && !PIC32MX
+library DSP_LIB_A "$HARMONY_VERSION_PATH/bin/framework/math/dsp/dsp_pic32mz.a"
+file DSP_LIB_H "$HARMONY_VERSION_PATH/framework/math/dsp/dsp.h" to "$PROJECT_HEADER_FILES/framework/math/dsp/dsp.h"
+endif
+
+ifblock USE_DSP && USE_DSP_EXCEPTION
+file DSP_EXC_C "$HARMONY_VERSION_PATH/framework/math/dsp/default-general-exception-handler.c" to "$PROJECT_SOURCE_FILES/framework/math/dsp/default-general-exception-handler.c"
+file DSP_EXC_S "$HARMONY_VERSION_PATH/framework/math/dsp/general-exception.s" to "$PROJECT_SOURCE_FILES/framework/math/dsp/general-exception.s"
+endif

@@ -1,0 +1,303 @@
+menu "TCPIP Stack"
+    
+
+config USE_TCPIP_STACK
+    bool "Use TCP/IP Stack?"
+    select TCPIP_USE_ARP
+    select USE_SYS_INT_NEEDED
+    select USE_SYS_TMR_NEEDED
+    select USE_SYS_RANDOM_NEEDED
+    select USE_SYS_PORTS_NEEDED
+    select USE_CRYPTO_LIB_NEEDED
+    select USE_CRYPTO_RANDOM_NEEDED
+    default n
+
+menu "RTOS Configuration"
+    depends on USE_TCPIP_STACK
+    depends on USE_3RDPARTY_RTOS
+
+config TCPIP_RTOS
+    string "Run Library Tasks As"
+    range 3RDPARTY_RTOS_SYS_TASKS_OPTIONS
+    default "Standalone"
+
+config TCPIP_RTOS_TASK_SIZE
+    int "Task Size"
+    depends on TCPIP_RTOS = "Standalone"
+    default 1024
+
+config TCPIP_RTOS_TASK_PRIORITY
+    int "Task Priority"
+    depends on TCPIP_RTOS = "Standalone"
+    default 1
+
+config TCPIP_RTOS_USE_DELAY
+    bool "Use Task Delay?"
+    depends on TCPIP_RTOS = "Standalone"
+    default y
+
+config TCPIP_RTOS_DELAY
+    int "Task Delay"
+    depends on TCPIP_RTOS = "Standalone"
+    depends on TCPIP_RTOS_USE_DELAY
+    default 1000
+endmenu
+
+enum TCPIP_ADDRESS_TYPE
+    "IP_ADDRESS_TYPE_ANY" ||
+    "IP_ADDRESS_TYPE_IPV4" ||
+    "IP_ADDRESS_TYPE_IPV6"
+
+enum TCPIP_STACK_IF_NAME
+    "PIC32INT" || 
+    "MRF24W" ||
+    "MRF24WN" ||
+    "ENCX24J600"
+
+enum TCPIP_STACK_PHY_TYPE
+    "National_DP83640" ||
+    "National_DP83848" ||
+    "SMSC_LAN8700" ||
+    "SMSC_LAN8720" ||
+    "SMSC_LAN8740" ||
+    "SMSC_LAN9303" ||
+    "IP_IP101GR"
+
+enum TCPIP_CONSOLE_UART_PORT
+    "SYS_MODULE_UART_1"
+    || "SYS_MODULE_UART_2"
+
+config TCPIP_STACK_USE_IPV4
+    bool "IPv4"
+    depends on USE_TCPIP_STACK
+    default y
+    ---help---
+    IDH_HTML_TCPIP_IPv4_Introduction
+    ---endhelp---
+
+config TCPIP_STACK_USE_IPV6
+	bool "IPv6"
+	depends on USE_TCPIP_STACK
+    select TCPIP_USE_SNTP_CLIENT_NEEDED
+	default n
+    ---help---
+    IDH_HTML_TCPIP_IPv6_Introduction
+    ---endhelp---
+    
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/ipv6.hconfig"
+
+config TCPIP_USE_TCP
+    bool "Use TCP"
+    depends on USE_TCPIP_STACK && (TCPIP_STACK_USE_IPV4 || TCPIP_STACK_USE_IPV6)
+    default y
+    ---help---
+        IDH_HTML_TCPIP_TCP_Introduction
+    ---endhelp---
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/tcp.hconfig"
+    
+config TCPIP_USE_UDP
+    bool "Use UDP"
+    depends on USE_TCPIP_STACK && (TCPIP_STACK_USE_IPV4 || TCPIP_STACK_USE_IPV6)
+    default y
+    ---help---
+        IDH_HTML_TCPIP_UDP_Introduction
+    ---endhelp---
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/udp.hconfig"
+
+    
+config TCPIP_STACK_USE_ICMP_CLIENT
+    bool "Use ICMPv4 Client"
+    depends on USE_TCPIP_STACK && (TCPIP_STACK_USE_IPV4 || TCPIP_STACK_USE_IPV6)
+    default y
+    ---help---
+    IDH_HTML_TCPIP_ICMP_Introduction
+    ---endhelp---
+    
+config TCPIP_STACK_NETWORK_CONFIG_NUMBER
+    int "Number of Network Configurations"
+    depends on USE_TCPIP_STACK
+    default 1
+    ---help---
+    IDH_HTML_TCPIP_NETWORK_CONFIG
+    ---endhelp---
+     
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/network_config_idx.ftl" 2 instances     
+     
+config TCPIP_STACK_TICK_RATE
+    int "TCP/IP Stack State Machine Tick Rate, ms."
+    depends on USE_TCPIP_STACK
+    default 5 
+    ---help---
+    Used by the Stack State Machine for periodic processing.
+    ---endhelp---
+
+config TCPIP_STACK_DRAM_SIZE
+    int "TCP/IP Stack Dynamic RAM Size"
+    depends on USE_TCPIP_STACK
+    default 39250
+    ---help---
+    The amount of dynamic RAM that the TCP/IP stack uses
+    ---endhelp---
+
+config TCPIP_STACK_DRAM_RUN_LIMIT
+    int "TCP/IP Stack Dynamic RAM Lower Limit"
+    depends on USE_TCPIP_STACK
+    default 2048
+    ---help---
+    The minimum amount of dynamic memory left for run time allocation by the stack (IP, UDP, etc)
+    This is just a warning threshold.
+    If after all the modules are initialized the amount of memory available in the TCPIP heap
+    is less then this limit then a warning will be displayed
+    (if the debug channel is enabled)
+    ---endhelp---
+
+config TCPIP_STACK_DRAM_DEBUG_ENABLE
+    bool "TCP/IP Stack Dynamic Allocation Debug"
+    depends on USE_TCPIP_STACK
+    default n
+    ---help---
+    Enable debugging of the an allocation call that failed.
+    If the system debug is enabled the stack will issue a
+    warning message on the system debug channel
+    ---endhelp---
+
+config TCPIP_STACK_DRAM_TRACE_ENABLE
+    bool "TCP/IP Stack Dynamic Allocation Trace"
+    depends on USE_TCPIP_STACK && TCPIP_STACK_DRAM_DEBUG_ENABLE
+    default n
+    ---help---
+    Enable tracing of the allocated memory by each module
+    The stack will trace all the memory allocated by a module
+    and provide various statistics
+    ---endhelp---
+
+config TCPIP_STACK_DRAM_TRACE_SLOTS
+    int "TCP/IP Stack Number of Trace Slots"
+    depends on USE_TCPIP_STACK && TCPIP_STACK_DRAM_TRACE_ENABLE
+    default 16
+    ---help---
+    This is the number of trace slots.
+    There is on slot needed per module that allocates memory from the heap
+    ---endhelp---
+
+config TCPIP_STACK_MALLOC_FUNC
+    string " Stack allocation function, malloc style"
+    depends on USE_TCPIP_STACK
+    default "malloc"
+	---help---
+    This is the function the stack will call to allocate memory
+    Use standard C library 'malloc' as a default
+	---endhelp---
+    
+config TCPIP_STACK_CALLOC_FUNC
+    string " Stack allocation function, calloc style"
+    depends on USE_TCPIP_STACK
+    default "calloc"
+	---help---
+    This is the function the stack will call to allocate memory
+    Use standard C library 'calloc' as a default
+	---endhelp---
+    
+config TCPIP_STACK_FREE_FUNC
+    string " Stack deallocation function, free style"
+    depends on USE_TCPIP_STACK
+    default "free"
+	---help---
+    This is the function the stack will call for freeing the allocated memory
+    Use standard C library 'free' as a default
+	---endhelp---
+    
+config TCPIP_STACK_EVENT_NOTIFICATION  
+    bool
+    depends on USE_TCPIP_STACK
+    default y
+
+config TCPIP_SYS_FS_WRAPPER_NEEDED
+	bool
+	depends on USE_TCPIP_STACK
+	depends on TCPIP_USE_SNMP || TCPIP_STACK_USE_HTTP_SERVER || TCPIP_USE_FTP_MODULE || TCPIP_USE_TFTPC_MODULE
+	default n if USE_SYS_FS_NEEDED = 0
+	default y
+	
+	
+    
+#source "$HARMONY_VERSION_PATH/framework/tcpip/config/tcpip_mac.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/arp.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/berkeley_api.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/tls.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/dhcp.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/dhcps.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/dns.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/dnss.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/ddns.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/ftp.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/http.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/icmp.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/nbns.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/tcpip_reboot.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/smtp.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/snmp.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/snmpv3.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/sntp.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/telnet.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/zeroconf.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/tcpip_announce.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/iperf.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/tcpip_cmd.hconfig"
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/tftpc.hconfig"
+ifblock TCPIP_SYS_FS_WRAPPER_NEEDED
+source "$HARMONY_VERSION_PATH/framework/tcpip/config/sys_fs_wrapper.hconfig"
+endif
+
+
+ifblock USE_TCPIP_STACK
+file TCPIP_COMMON_BIG_INT_C "$HARMONY_VERSION_PATH/framework/tcpip/src/common/big_int.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/common/big_int.c"
+file TCPIP_COMMON_BIG_INT_S "$HARMONY_VERSION_PATH/framework/tcpip/src/common/big_int_helper_c32.S" to "$PROJECT_SOURCE_FILES/framework/tcpip/common/big_int_helper_c32.S"
+file TCPIP_COMMON_BIG_INT_H "$HARMONY_VERSION_PATH/framework/tcpip/src/common/big_int.h" to "$PROJECT_HEADER_FILES/framework/tcpip/common/big_int.h"
+file TCPIP_COMMON_HASHS_C "$HARMONY_VERSION_PATH/framework/tcpip/src/common/hashes.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/common/hashes.c"
+file TCPIP_COMMON_HASHS_H "$HARMONY_VERSION_PATH/framework/tcpip/src/common/hashes.h" to "$PROJECT_HEADER_FILES/framework/tcpip/common/hashes.h"
+file TCPIP_COMMON_HELPERS_C "$HARMONY_VERSION_PATH/framework/tcpip/src/common/helpers.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/common/helpers.c"
+file TCPIP_COMMON_HELPERS_H "$HARMONY_VERSION_PATH/framework/tcpip/src/common/helpers.h" to "$PROJECT_HEADER_FILES/framework/tcpip/common/helpers.h"
+file TCPIP_COMMON_LFSR_C "$HARMONY_VERSION_PATH/framework/tcpip/src/common/lfsr.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/common/lfsr.c"
+file TCPIP_COMMON_LFSR_H "$HARMONY_VERSION_PATH/framework/tcpip/src/common/lfsr.h" to "$PROJECT_HEADER_FILES/framework/tcpip/common/lfsr.h"
+file TCPIP_HASH_FNV_C "$HARMONY_VERSION_PATH/framework/tcpip/src/hash_fnv.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/stack/hash_fnv.c"
+file TCPIP_HASH_FNV_H "$HARMONY_VERSION_PATH/framework/tcpip/src/hash_fnv.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/hash_fnv.h"
+file TCPIP_LINKED_LIST_H "$HARMONY_VERSION_PATH/framework/tcpip/src/link_list.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/link_list.h"
+file TCPIP_OAHASH_C "$HARMONY_VERSION_PATH/framework/tcpip/src/oahash.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/stack/oahash.c"
+file TCPIP_OAHASH_H "$HARMONY_VERSION_PATH/framework/tcpip/src/oahash.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/oahash.h"
+file TCPIP_HEAP_ALLOC_C "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_heap_alloc.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/stack/tcpip_heap_alloc.c"
+file TCPIP_HEAP_ALLOC_H "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_heap_alloc.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/tcpip_heap_alloc.h"
+file TCPIP_HELPERS_C "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_helpers.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/stack/tcpip_helpers.c"
+file TCPIP_HELPERS_C_32 "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_helper_c32.S" to "$PROJECT_SOURCE_FILES/framework/tcpip/stack/tcpip_helper_c32.S"
+file TCPIP_HELPERS_H "$HARMONY_VERSION_PATH/framework/tcpip/tcpip_helpers.h" to "$PROJECT_HEADER_FILES/framework/tcpip/tcpip_helpers.h"
+file TCPIP_HELPERS_PRIVATE_H "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_helpers_private.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/tcpip_helpers_private.h"
+file TCPIP_MANAGER_C "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_manager.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/stack/tcpip_manager.c"
+file TCPIP_MANAGER_H "$HARMONY_VERSION_PATH/framework/tcpip/tcpip_manager.h" to "$PROJECT_HEADER_FILES/framework/tcpip/tcpip_manager.h"
+file TCPIP_MANAGER_CONTROL_H "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_manager_control.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/tcpip_manager_control.h"
+file TCPIP_MODULE_MANAGER_H "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_module_manager.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/tcpip_module_manager.h"
+file TCPIP_NOTIFY_C "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_notify.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/stack/tcpip_notify.c"
+file TCPIP_NOTIFY_H "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_notify.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/tcpip_notify.h"
+file TCPIP_PACKET_C "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_packet.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/stack/tcpip_packet.c"
+file TCPIP_PACKET_H "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_packet.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/tcpip_packet.h"
+file TCPIP_PRIVATE_H "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_private.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/tcpip_private.h"
+file TCPIP_TYPES_H "$HARMONY_VERSION_PATH/framework/tcpip/src/tcpip_types.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/tcpip_types.h"
+file TCPIP_H "$HARMONY_VERSION_PATH/framework/tcpip/tcpip.h" to "$PROJECT_HEADER_FILES/framework/tcpip/tcpip.h"
+file TCPIP_COMMON_PORTS_H "$HARMONY_VERSION_PATH/framework/tcpip/tcpip_common_ports.h" to "$PROJECT_HEADER_FILES/framework/tcpip/tcpip_common_ports.h"
+endif
+
+ifblock TCPIP_STACK_USE_IPV4
+file TCPIP_IPV4_H "$HARMONY_VERSION_PATH/framework/tcpip/ipv4.h" to "$PROJECT_HEADER_FILES/framework/tcpip/ipv4.h"
+file TCPIP_IPV4_C "$HARMONY_VERSION_PATH/framework/tcpip/src/ipv4.c" to "$PROJECT_SOURCE_FILES/framework/tcpip/stack/ipv4.c"
+file TCPIP_IPV4_MANAGER_H "$HARMONY_VERSION_PATH/framework/tcpip/src/ipv4_manager.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/ipv4_manager.h"
+file TCPIP_IPV4_PRIVATE_H "$HARMONY_VERSION_PATH/framework/tcpip/src/ipv4_private.h" to "$PROJECT_HEADER_FILES/framework/tcpip/stack/ipv4_private.h"
+endif
+
+ifblock USE_TCPIP_STACK || TCPIP_USE_ETH_MAC
+file TCPIP_MAC_H "$HARMONY_VERSION_PATH/framework/tcpip/tcpip_mac.h" to                                     "$PROJECT_HEADER_FILES/framework/tcpip/tcpip_mac.h"
+file TCPIP_MAC_OBJECT_H "$HARMONY_VERSION_PATH/framework/tcpip/tcpip_mac_object.h" to                       "$PROJECT_HEADER_FILES/framework/tcpip/tcpip_mac_object.h"
+file TCPIP_ETHERNET_H "$HARMONY_VERSION_PATH/framework/tcpip/tcpip_ethernet.h" to                           "$PROJECT_HEADER_FILES/framework/tcpip/tcpip_ethernet.h"
+
+endif
+
+endmenu
+

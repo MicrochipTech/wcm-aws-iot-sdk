@@ -1,0 +1,63 @@
+ifblock SYS_TOUCH_PANEL_CONFIG_NUMBER_IDX0
+
+enum SYS_TOUCH_CONTROLLER_NAME_IDX0
+    "AR1020"
+    || "FT5X06"
+       || "MTCH6301"
+          || "ADC10BIT"
+
+config SYS_TOUCH_CONTROLLER_IDX0
+    string "Controller"
+    range SYS_TOUCH_CONTROLLER_NAME_IDX0
+    default "MTCH6301"
+    ---help---
+    IDH_HTML_TOUCH_PANEL_CONFIG
+    ---endhelp---
+
+menu "RTOS Configuration (Instance 0)"
+    depends on USE_SYS_TOUCH
+    depends on USE_3RDPARTY_RTOS
+
+config SYS_TOUCH_RTOS_IDX0
+    string "Run Library Tasks As"
+    range 3RDPARTY_RTOS_SYS_TASKS_OPTIONS
+    default "Combined with System Tasks"
+
+config SYS_TOUCH_IDX0_RTOS_TASK_SIZE
+    int "Task Size"
+    depends on SYS_TOUCH_RTOS_IDX0 = "Standalone"
+    default 1024
+
+config SYS_TOUCH_IDX0_RTOS_TASK_PRIORITY
+    int "Task Priority"
+    depends on SYS_TOUCH_RTOS_IDX0 = "Standalone"
+    default 1
+
+config SYS_TOUCH_IDX0_RTOS_USE_DELAY
+    bool "Use Task Delay?"
+    depends on SYS_TOUCH_RTOS_IDX0 = "Standalone"
+    default y
+
+config SYS_TOUCH_IDX0_RTOS_DELAY
+    int "Task Delay"
+    depends on SYS_TOUCH_RTOS_IDX0 = "Standalone"
+    depends on SYS_TOUCH_IDX0_RTOS_USE_DELAY
+    default 1000
+endmenu
+
+config SYS_TOUCH_MAX_CLIENT_OBJECTS_IDX0
+    int "Maximum Touch Clients"
+    default 1
+    ---help---
+    IDH_HTML_TOUCH_PANEL_CONFIG
+    ---endhelp---
+
+config SYS_TOUCH_MODE_IDX0
+    default "STATIC"
+    depends on USE_SYS_TOUCH
+    range TOUCH_MODES
+    ---help---
+    IDH_HTML_TOUCH_PANEL_CONFIG
+    ---endhelp---
+
+endif

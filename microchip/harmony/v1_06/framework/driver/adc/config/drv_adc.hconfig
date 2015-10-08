@@ -1,0 +1,219 @@
+menu "ADC"
+    depends on HAVE_ADC || HAVE_ADCP || HAVE_ADCHS
+
+enum DRV_ADC_MODE_ENUM
+    "STATIC"
+    
+config DRV_ADC_USE_DRIVER_NEEDED
+    bool
+
+config USE_DRV_ADC
+    depends on HAVE_ADC || HAVE_ADCP || HAVE_ADCHS
+    bool "Use ADC Driver?"
+    default n if !DRV_ADC_USE_DRIVER_NEEDED
+    default y if DRV_ADC_USE_DRIVER_NEEDED
+    ---help---
+    ADC static driver implementation (only for PIC32MX and PIC32MZ newer devices (with FPU))
+    ---endhelp---
+	
+config DRV_ADC_USE_VREFP_PIN
+    bool
+    depends on USE_DRV_ADC
+    default y if HAVE_ADC && DRV_ADC_VOLTAGE_REFERENCE_ADC = "ADC_REFERENCE_VREFPLUS_TO_AVSS"
+    default y if HAVE_ADC && DRV_ADC_VOLTAGE_REFERENCE_ADC = "ADC_REFERENCE_VREFPLUS_TO_VREFNEG"
+    default y if HAVE_ADCP && DRV_ADC_VOLTAGE_REFERENCE_ADCP = "ADCP_VREF_VREFP_AVSS"
+    default y if HAVE_ADCP && DRV_ADC_VOLTAGE_REFERENCE_ADCP = "ADCP_VREF_VREFP_VREFN"
+	default y if HAVE_ADCHS && DRV_ADC_VOLTAGE_REFERENCE_ADCHS = "ADCHS_VREF_EXTVREFP_AVSS"
+	default y if HAVE_ADCHS && DRV_ADC_VOLTAGE_REFERENCE_ADCHS = "ADCHS_VREF_EXTVREFP_EXTVREFN"
+	
+config DRV_ADC_USE_VREFN_PIN
+    bool
+    depends on USE_DRV_ADC
+    default y if HAVE_ADC && DRV_ADC_VOLTAGE_REFERENCE_ADC = "ADC_REFERENCE_AVDD_TO_VREF_NEG"
+    default y if HAVE_ADC && DRV_ADC_VOLTAGE_REFERENCE_ADC = "ADC_REFERENCE_VREFPLUS_TO_VREFNEG"
+    default y if HAVE_ADCP && DRV_ADC_VOLTAGE_REFERENCE_ADCP = "ADCP_VREF_AVDD_VREFN"
+    default y if HAVE_ADCP && DRV_ADC_VOLTAGE_REFERENCE_ADCP = "ADCP_VREF_VREFP_VREFN"
+	default y if HAVE_ADCHS && DRV_ADC_VOLTAGE_REFERENCE_ADCHS = "ADCHS_VREF_AVDD_EXTVREFN"
+	default y if HAVE_ADCHS && DRV_ADC_VOLTAGE_REFERENCE_ADCHS = "ADCHS_VREF_EXTVREFP_EXTVREFN"
+	default y if HAVE_ADCHS && DRV_ADC_VOLTAGE_REFERENCE_ADCHS = "ADCHS_VREF_INTVREFP_EXTVREFN"
+	
+config DRV_ADC_TYPE_ADC
+    bool
+    depends on USE_DRV_ADC
+	default y if HAVE_ADC
+
+config DRV_ADC_TYPE_ADCP
+    bool
+    depends on USE_DRV_ADC
+	default y if HAVE_ADCP
+
+config DRV_ADC_TYPE_ADCHS
+    bool
+    depends on USE_DRV_ADC
+	default y if HAVE_ADCHS	
+	
+ifblock DRV_ADC_TYPE_ADC
+source "$HARMONY_VERSION_PATH/framework/driver/adc/config/drv_adc_mx.hconfig"
+endif
+
+ifblock DRV_ADC_TYPE_ADCP
+source "$HARMONY_VERSION_PATH/framework/driver/adc/config/drv_adcp.hconfig"
+endif
+
+ifblock DRV_ADC_TYPE_ADCHS
+source "$HARMONY_VERSION_PATH/framework/driver/adc/config/drv_adchs.hconfig"
+endif
+
+comment "**** Info: Only two dedicated channels are supported (one for each MUX) ****"
+	depends on DRV_ADC_TYPE_ADC && !DRV_ADC_SCAN_MODE
+
+config DRV_ADC_CHANNEL_INSTANCES_NUMBER
+    int "Number of Analog Channel Instances"
+    depends on DRV_ADC_TYPE_ADC || DRV_ADC_TYPE_ADCP
+    range 1 2 if DRV_ADC_TYPE_ADC = y && DRV_ADC_SCAN_MODE = n
+	range 1 54 if DRV_ADC_TYPE_ADCP = y || (DRV_ADC_TYPE_ADC = y && DRV_ADC_SCAN_MODE = y)
+    default 1
+    ---help---
+    Specify Number of Analog Channels to Use
+    ---endhelp---
+
+ifblock USE_DRV_ADC && DRV_ADC_TYPE_ADC
+source "$HARMONY_VERSION_PATH/framework/driver/adc/config/drv_adc_channel_idx.ftl" 54 instances
+endif
+
+
+config USE_DRV_ADCHS_CLASS_2_ANALOG_INPUT_CONVERT
+    depends on DRV_ADC_TYPE_ADCHS
+    bool "Enable Class 2 Analog Input conversion?"
+    default n
+    ---help---
+    Class 2 Analog input conversion
+    ---endhelp---
+
+config DRV_ADCHS_CLASS_2_ANALOG_INPUT_CONVERT_INSTANCES_NUMBER
+    int "Number of Class 2 Analog Input Instances"
+    depends on USE_DRV_ADCHS_CLASS_2_ANALOG_INPUT_CONVERT
+    range 1 7 if DRV_ADC_TYPE_ADCHS = y && USE_DRV_ADCHS_CLASS_2_ANALOG_INPUT_CONVERT = y
+    default 1
+    ---help---
+    Specify Number of Class 2 Analog inputs to be converted
+    ---endhelp---
+
+ifblock USE_DRV_ADC && USE_DRV_ADCHS_CLASS_2_ANALOG_INPUT_CONVERT
+source "$HARMONY_VERSION_PATH/framework/driver/adc/config/drv_adchs_class2_analog_input_idx.ftl" 7 instances
+endif
+
+
+config USE_DRV_ADCHS_SCAN_MODE
+    depends on DRV_ADC_TYPE_ADCHS
+    bool "Enable Analog Input scanning?"
+    default n
+    ---help---
+    Analog input scanning mode to be enabled or not
+    ---endhelp---
+
+config DRV_ADCHS_ANALOG_INPUT_SCAN_INSTANCES_NUMBER
+    int "Number of Analog Input Scan Instances"
+    depends on USE_DRV_ADCHS_SCAN_MODE
+    range 1 NUM_ADCHS_AN_INPUT_ID if DRV_ADC_TYPE_ADCHS = y && USE_DRV_ADCHS_SCAN_MODE = y
+    default 1
+    ---help---
+    Specify Number of Analog inputs to be scanned
+    ---endhelp---
+
+config DRV_ADCHS_ANALOG_INPUT_SCAN_LEVEL_TRIGGER_SENSITIVE
+    bool "Check for Level trigger; Un-check for edge trigger, for selected analog input"
+	depends on USE_DRV_ADCHS_SCAN_MODE
+	default n
+	---help---
+	IDH_HTML_ADCHS_ANALOG_INPUT_SCAN_LEVEL_TRIGGER_SENSITIVE
+	---endhelp---
+
+config DRV_ADCHS_ANALOG_INPUT_SCAN_TRIGGER_SOURCE
+    string "Analog Input Scan Trigger Source"
+	depends on USE_DRV_ADCHS_SCAN_MODE
+	range ADCHS_SCAN_TRIGGER_SOURCE
+    default "ADCHS_SCAN_TRIGGER_SOURCE_GLOBAL_SOFTWARE_EDGE"
+	---help---
+	IDH_HTML_ADCHS_ANALOG_INPUT_SCAN_TRIGGER_SOURCE
+	---endhelp---
+
+ifblock USE_DRV_ADC && USE_DRV_ADCHS_SCAN_MODE
+source "$HARMONY_VERSION_PATH/framework/driver/adc/config/drv_adchs_analog_input_scan_idx.ftl" 45 instances
+endif
+
+
+config USE_DRV_ADCHS_DIGITAL_COMPARATOR
+    depends on DRV_ADC_TYPE_ADCHS
+    bool "Enable Digital Comparator?"
+    default n
+    ---help---
+    Digital Comparator to be enabled or not?
+    ---endhelp---
+
+config DRV_ADCHS_DIGITAL_COMPARATOR_INSTANCES_NUMBER
+    int "Number of Digital Comparator Instances"
+    depends on USE_DRV_ADCHS_DIGITAL_COMPARATOR
+    range 1 6 if DRV_ADC_TYPE_ADCHS = y && USE_DRV_ADCHS_DIGITAL_COMPARATOR = y
+    default 1
+    ---help---
+    Specify Number of Digital comparator to be enabled
+    ---endhelp---
+
+ifblock USE_DRV_ADC && USE_DRV_ADCHS_DIGITAL_COMPARATOR
+source "$HARMONY_VERSION_PATH/framework/driver/adc/config/drv_adchs_digital_comparator_idx.ftl" 6 instances
+endif
+
+
+config USE_DRV_ADCHS_DIGITAL_FILTER
+    depends on DRV_ADC_TYPE_ADCHS
+    bool "Enable Digital Filter?"
+    default n
+    ---help---
+    Digital Filter to be enabled or not?
+    ---endhelp---
+
+config DRV_ADCHS_DIGITAL_FILTER_INSTANCES_NUMBER
+    int "Number of Digital Filter Instances"
+    depends on USE_DRV_ADCHS_DIGITAL_FILTER
+    range 1 6 if DRV_ADC_TYPE_ADCHS = y && USE_DRV_ADCHS_DIGITAL_FILTER = y
+    default 1
+    ---help---
+    Specify Number of Digital Filter to be enabled
+    ---endhelp---
+
+ifblock USE_DRV_ADC && USE_DRV_ADCHS_DIGITAL_FILTER
+source "$HARMONY_VERSION_PATH/framework/driver/adc/config/drv_adchs_digital_filter_idx.ftl" 6 instances
+endif
+
+
+config USE_DRV_ADCHS_CVD
+    depends on DRV_ADC_TYPE_ADCHS
+    bool "Enable CVD (Capacitive voltage divider)?"
+    default n
+    ---help---
+    CVD to be enabled or not?
+    ---endhelp---
+	
+comment "**** Do not use Comparator-1 for other application (or initialize it separately), when CVD is enabled ****"
+	depends on DRV_ADC_TYPE_ADCHS && USE_DRV_ADCHS_CVD
+
+ifblock USE_DRV_ADCHS_CVD
+source "$HARMONY_VERSION_PATH/framework/driver/adc/config/drv_adchs_cvd.hconfig"
+endif
+
+endmenu
+
+ifblock DRV_ADC_TYPE_ADC
+ifblock DRV_ADC_DRIVER_MODE = "STATIC"
+template ADC_DRV_STATIC_H "$HARMONY_VERSION_PATH/framework/driver/adc/templates/drv_adc_static.h.ftl" to "$PROJECT_HEADER_FILES/app/system_config/$CONFIGURATION/framework/driver/adc/drv_adc_static.h"
+template ADC_DRV_STATIC_C "$HARMONY_VERSION_PATH/framework/driver/adc/templates/drv_adc_static.c.ftl" to "$PROJECT_SOURCE_FILES/app/system_config/$CONFIGURATION/framework/driver/adc/src/drv_adc_static.c"
+endif
+endif
+
+ifblock DRV_ADC_TYPE_ADCHS
+ifblock DRV_ADCHS_DRIVER_MODE = "STATIC"
+template ADC_DRV_STATIC_HS_H "$HARMONY_VERSION_PATH/framework/driver/adc/templates/drv_adc_hs_static.h.ftl" to "$PROJECT_HEADER_FILES/app/system_config/$CONFIGURATION/framework/driver/adc/drv_adc_static.h"
+template ADC_DRV_STATIC_HS_C "$HARMONY_VERSION_PATH/framework/driver/adc/templates/drv_adc_hs_static.c.ftl" to "$PROJECT_SOURCE_FILES/app/system_config/$CONFIGURATION/framework/driver/adc/src/drv_adc_static.c"
+endif
+endif

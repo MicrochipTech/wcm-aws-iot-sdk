@@ -1,0 +1,95 @@
+menu "CMP"
+    depends on HAVE_CMP
+
+enum DRV_CMP_MODE
+    "STATIC"
+    
+config DRV_CVREF_ENABLE
+    bool "Use CVREF?"
+    default n
+    ---help---
+    IDH_HTML_PLIB_CMP_CVREF_Enable_CMP_MODULE_ID
+    ---endhelp---
+
+config DRV_CMP_CVREF_VOLTAGE_SOURCE
+    string "CVREF Voltage Source"
+    depends on DRV_CVREF_ENABLE
+    range CMP_CVREF_VOLTAGE_SOURCE
+    default "CMP_CVREF_VOLTAGE_SOURCE_VDD"
+    ---help---
+    IDH_HTML_CMP_CVREF_VOLTAGE_SOURCE
+    ---endhelp---
+
+config DRV_CMP_CVREF_VALUE
+    string "CVREF Value"
+    depends on DRV_CVREF_ENABLE
+    range CMP_CVREF_VALUE
+    default "CMP_CVREF_VALUE_0"
+    ---help---
+    IDH_HTML_CMP_CVREF_VALUE
+    ---endhelp---
+
+
+config DRV_CMP_CVREF_WIDE_RANGE
+    bool "Wide Range Enable"
+    depends on DRV_CVREF_ENABLE
+    default n
+
+config DRV_CMP_CVREF_OE
+    bool "Enable Voltage Referece On CVREFOUT Pin"
+    depends on DRV_CVREF_ENABLE
+    default n
+    
+config USE_DRV_CMP
+    bool "Use CMP Driver?"
+    select DRIVER
+    default n
+    ---help---
+    IDH_HTML_Comparator_Peripheral_Library
+    ---endhelp---
+
+config DRV_CMP_DRIVER_MODE
+    string "Driver Implementation"
+    depends on USE_DRV_CMP
+    range DRV_CMP_MODE
+    default "STATIC"
+    persistent
+    ---help---
+    IDH_HTML_Comparator_Peripheral_Library
+    ---endhelp---
+
+config DRV_CMP_INTERRUPT_MODE
+    bool "Interrupt Mode"
+    depends on USE_DRV_CMP
+    default n
+    ---help---
+    Checking this option would enable interrupt mode of the   module and place necessary calls in the driver.
+    ---endhelp---
+
+config DRV_CMP_INCLUDE_INTERRUPT_SERVICE
+    bool
+    depends on USE_DRV_CMP
+    depends on DRV_CMP_DRIVER_MODE = "STATIC"
+    depends on DRV_CMP_INTERRUPT_MODE
+    select USE_SYS_INT_NEEDED
+    default y
+    
+config DRV_CMP_INSTANCES_NUMBER
+    int "Number of CMP Driver Instances"
+    depends on USE_DRV_CMP
+    range 1 CMP_NUMBER_OF_MODULES
+    default 1
+    ---help---
+    Sets up the maximum number of hardware instances that can be supported. 
+    ---endhelp---
+
+source "$HARMONY_VERSION_PATH/framework/driver/cmp/config/drv_cmp_idx.ftl" 3 instances
+
+endmenu
+
+
+ifblock USE_DRV_CMP || DRV_CVREF_ENABLE
+template CMP_STATIC_DRV_C "$HARMONY_VERSION_PATH/framework/driver/cmp/templates/drv_cmp_static.c.ftl" to "$PROJECT_SOURCE_FILES/app/system_config/$CONFIGURATION/framework/driver/cmp/src/drv_cmp_static.c"
+template CMP_STATIC_DRV_H "$HARMONY_VERSION_PATH/framework/driver/cmp/templates/drv_cmp_static.h.ftl" to "$PROJECT_HEADER_FILES/app/system_config/$CONFIGURATION/framework/driver/cmp/drv_cmp_static.h"
+endif
+
