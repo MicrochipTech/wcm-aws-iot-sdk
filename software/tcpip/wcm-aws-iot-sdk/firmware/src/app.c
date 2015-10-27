@@ -65,7 +65,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#define WCM_AWS_IOT_STARTER_KIT_APP_VERSION "0.1.0"
+#define IOT_WIFI_G_AWS_IOT_STARTER_KIT_APP_VERSION "0.2.0"
 
 // *****************************************************************************
 /* Application Data
@@ -140,7 +140,9 @@ void APP_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     appData.state = APP_STATE_INIT;
-    const char * host = "data.iot.us-east-1.amazonaws.com\0";
+    
+    // Your AWS IoT Service Host
+    const char * host = "endpoint.example.com\0";
     strncpy((char *)&appData.aws_iot_host, host, strlen(host));
     appData.port = 8883;
     appData.tcpipTimeout = 0;
@@ -172,35 +174,16 @@ void APP_Tasks ( void )
 	int len = 0;
     
     // Unique client ID for each MQTT connection
-    data.clientID.cstring = "000001wcm";
+    data.clientID.cstring = "000001iot";
 	data.keepAliveInterval = 60;
 	data.cleansession = 1;
     
     // To Shadow Topic
-    topicStringUpdate.cstring = "$aws/things/000001wcm/shadow/update";
+    // This is the thing you created and are subscribing to
+    topicStringUpdate.cstring = "$aws/things/000001iot/shadow/update";
     
     // From Shadow Topic
-    topicStringDelta.cstring = "$aws/things/000001wcm/shadow/update/delta";
-    
-    // Example JSON Payload for WCM Development Kit
-    /*
-        {
-          "reported": {
-            "button1":"down",
-            "button2":"down",
-            "button3":"down",
-            "button4":"down",
-            "led1":"off",
-            "led2":"off",
-            "led3":"off",
-            "led4":"off",
-            "potentiometer":"1023"
-          },
-          "desired": {
-            "button1":"up",
-          }
-        }
-    */
+    topicStringDelta.cstring = "$aws/things/000001iot/shadow/update/delta";
           
     // Send a publish for each switch press
     // If a switch is detected, we set the flag to publish its value and put this

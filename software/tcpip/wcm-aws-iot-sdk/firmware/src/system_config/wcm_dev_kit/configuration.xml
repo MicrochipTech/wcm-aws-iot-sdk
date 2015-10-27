@@ -228,12 +228,12 @@
         <Path>Source Files/framework/driver/wifi/mrf24w/src</Path>
       </File>
       <File>
-        <Name>tcpip_notify.h</Name>
-        <Path>Header Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
         <Name>drv_wifi_priv.h</Name>
         <Path>Header Files/framework/driver/wifi/mrf24w/src</Path>
+      </File>
+      <File>
+        <Name>tcpip_notify.h</Name>
+        <Path>Header Files/framework/tcpip/stack</Path>
       </File>
       <File>
         <Name>crypto.h</Name>
@@ -248,12 +248,12 @@
         <Path>Header Files/framework/tcpip/common</Path>
       </File>
       <File>
-        <Name>integer.c</Name>
-        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
-      </File>
-      <File>
         <Name>drv_wifi.h</Name>
         <Path>Header Files/framework/driver/wifi/mrf24w</Path>
+      </File>
+      <File>
+        <Name>integer.c</Name>
+        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
         <Name>error-ssl.h</Name>
@@ -300,28 +300,28 @@
         <Path>Source Files/framework/tcpip/stack</Path>
       </File>
       <File>
-        <Name>mpi_superclass.h</Name>
-        <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
+        <Name>drv_wifi_spi.h</Name>
+        <Path>Header Files/framework/driver/wifi/mrf24w/src</Path>
       </File>
       <File>
         <Name>drv_wifi_update_firmware_xmodem.c</Name>
         <Path>Source Files/framework/driver/wifi/mrf24w/src</Path>
       </File>
       <File>
-        <Name>drv_wifi_spi.h</Name>
-        <Path>Header Files/framework/driver/wifi/mrf24w/src</Path>
+        <Name>mpi_superclass.h</Name>
+        <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
         <Name>big_int.h</Name>
         <Path>Header Files/framework/tcpip/common</Path>
       </File>
       <File>
-        <Name>des3.c</Name>
-        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
-      </File>
-      <File>
         <Name>arc4.h</Name>
         <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
+      </File>
+      <File>
+        <Name>des3.c</Name>
+        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
         <Name>dns.h</Name>
@@ -400,12 +400,12 @@
         <Path>Source Files/framework/driver/wifi/mrf24w/src</Path>
       </File>
       <File>
-        <Name>logging.c</Name>
-        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
-      </File>
-      <File>
         <Name>options.h</Name>
         <Path>Header Files/third_party/wolfssl</Path>
+      </File>
+      <File>
+        <Name>logging.c</Name>
+        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
         <Name>misc.h</Name>
@@ -840,12 +840,12 @@
         <Path>Source Files/framework/driver/wifi/mrf24w/src</Path>
       </File>
       <File>
-        <Name>md4.c</Name>
-        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
-      </File>
-      <File>
         <Name>types.h</Name>
         <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
+      </File>
+      <File>
+        <Name>md4.c</Name>
+        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
         <Name>icmp.c</Name>
@@ -876,31 +876,31 @@
         <Path>Source Files/framework/driver/wifi/mrf24w/src</Path>
       </File>
       <File>
-        <Name>chacha20_poly1305.c</Name>
-        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
-      </File>
-      <File>
         <Name>arp_manager.h</Name>
         <Path>Header Files/framework/tcpip/stack</Path>
       </File>
       <File>
-        <Name>internal.c</Name>
-        <Path>Source Files/third_party/wolfssl</Path>
+        <Name>chacha20_poly1305.c</Name>
+        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
         <Name>drv_spi_sys_queue_fifo.c</Name>
         <Path>Source Files/framework/driver/spi</Path>
       </File>
       <File>
+        <Name>internal.c</Name>
+        <Path>Source Files/third_party/wolfssl</Path>
+      </File>
+      <File>
         <Name>poly1305.c</Name>
         <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
-        <Name>ge_operations.h</Name>
+        <Name>blake2-int.h</Name>
         <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
-        <Name>blake2-int.h</Name>
+        <Name>ge_operations.h</Name>
         <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
@@ -916,12 +916,12 @@
         <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
-        <Name>sniffer_error.h</Name>
-        <Path>Header Files/third_party/wolfssl</Path>
-      </File>
-      <File>
         <Name>tls.h</Name>
         <Path>Header Files/framework/tcpip</Path>
+      </File>
+      <File>
+        <Name>sniffer_error.h</Name>
+        <Path>Header Files/third_party/wolfssl</Path>
       </File>
       <File>
         <Name>camellia.c</Name>
@@ -936,12 +936,12 @@
         <Path>Header Files/framework/tcpip/common</Path>
       </File>
       <File>
-        <Name>sys_ports.c</Name>
-        <Path>Source Files/framework/system/ports/src</Path>
-      </File>
-      <File>
         <Name>drv_spi_internal.h</Name>
         <Path>Header Files/framework/driver/spi/private/dynamic</Path>
+      </File>
+      <File>
+        <Name>sys_ports.c</Name>
+        <Path>Source Files/framework/system/ports/src</Path>
       </File>
       <File>
         <Name>nbns_manager.h</Name>
@@ -952,12 +952,12 @@
         <Path>Source Files/framework/tcpip/stack</Path>
       </File>
       <File>
-        <Name>tcpip.h</Name>
-        <Path>Header Files/framework/tcpip</Path>
-      </File>
-      <File>
         <Name>sys_reset.c</Name>
         <Path>Source Files/framework/system/reset/src</Path>
+      </File>
+      <File>
+        <Name>tcpip.h</Name>
+        <Path>Header Files/framework/tcpip</Path>
       </File>
       <File>
         <Name>hc128.c</Name>
@@ -980,15 +980,11 @@
         <Path>Source Files/third_party/wolfssl/wolfcrypt/port/pic32</Path>
       </File>
       <File>
-        <Name>md4.h</Name>
-        <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
-      </File>
-      <File>
         <Name>hashes.c</Name>
         <Path>Source Files/framework/tcpip/common</Path>
       </File>
       <File>
-        <Name>settings.h</Name>
+        <Name>md4.h</Name>
         <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
@@ -996,23 +992,23 @@
         <Path>Source Files/framework/tcpip/stack</Path>
       </File>
       <File>
-        <Name>curve25519.c</Name>
-        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
-      </File>
-      <File>
-        <Name>blake2b.c</Name>
-        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
+        <Name>settings.h</Name>
+        <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
         <Name>sha256.h</Name>
         <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
-        <Name>sha.h</Name>
-        <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
+        <Name>blake2b.c</Name>
+        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
-        <Name>md5.h</Name>
+        <Name>curve25519.c</Name>
+        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
+      </File>
+      <File>
+        <Name>sha.h</Name>
         <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
@@ -1020,40 +1016,44 @@
         <Path>Header Files/framework/tcpip</Path>
       </File>
       <File>
-        <Name>internal.h</Name>
-        <Path>Header Files/third_party/wolfssl</Path>
+        <Name>md5.h</Name>
+        <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
-        <Name>memory.c</Name>
-        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
+        <Name>internal.h</Name>
+        <Path>Header Files/third_party/wolfssl</Path>
       </File>
       <File>
         <Name>hc128.h</Name>
         <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
-        <Name>dhcp.c</Name>
-        <Path>Source Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
-        <Name>drv_wifi_eint.h</Name>
-        <Path>Header Files/framework/driver/wifi/mrf24w/src</Path>
+        <Name>memory.c</Name>
+        <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
         <Name>drv_spi.h</Name>
         <Path>Header Files/framework/driver/spi</Path>
       </File>
       <File>
+        <Name>drv_wifi_eint.h</Name>
+        <Path>Header Files/framework/driver/wifi/mrf24w/src</Path>
+      </File>
+      <File>
+        <Name>dhcp.c</Name>
+        <Path>Source Files/framework/tcpip/stack</Path>
+      </File>
+      <File>
         <Name>md5.c</Name>
         <Path>Source Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
-        <Name>des3.h</Name>
-        <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
-      </File>
-      <File>
         <Name>big_int.c</Name>
         <Path>Source Files/framework/tcpip/common</Path>
+      </File>
+      <File>
+        <Name>des3.h</Name>
+        <Path>Header Files/third_party/wolfssl/wolfcrypt</Path>
       </File>
       <File>
         <Name>tcp.h</Name>
@@ -1124,14 +1124,14 @@
         <Checksum>909C50B5440A6E8DCAEE1B0A1CEE32A5</Checksum>
       </Template>
       <Template>
-        <Name>system_definitions.h</Name>
-        <Path>Header Files/app/system_config/wcm_dev_kit</Path>
-        <Checksum>00694B34AFBDB037181BC45778FD131E</Checksum>
-      </Template>
-      <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/wcm_dev_kit</Path>
         <Checksum>60157B19397BD59E754E1669E3DB8C96</Checksum>
+      </Template>
+      <Template>
+        <Name>system_definitions.h</Name>
+        <Path>Header Files/app/system_config/wcm_dev_kit</Path>
+        <Checksum>00694B34AFBDB037181BC45778FD131E</Checksum>
       </Template>
       <Template>
         <Name>sys_ports_static.c</Name>
@@ -1139,14 +1139,14 @@
         <Checksum>BDAE280569ED20E52D0025190D1E4BA1</Checksum>
       </Template>
       <Template>
-        <Name>system_exceptions.c</Name>
-        <Path>Source Files/app/system_config/wcm_dev_kit</Path>
-        <Checksum>C111969CA43D6CEA1E9E33A6164E7AE0</Checksum>
-      </Template>
-      <Template>
         <Name>sys_clk_static.h</Name>
         <Path>Header Files/app/system_config/wcm_dev_kit/framework/system/clk</Path>
         <Checksum>999179DADE9ECD59953526F5E9F83ACC</Checksum>
+      </Template>
+      <Template>
+        <Name>system_exceptions.c</Name>
+        <Path>Source Files/app/system_config/wcm_dev_kit</Path>
+        <Checksum>C111969CA43D6CEA1E9E33A6164E7AE0</Checksum>
       </Template>
     </Templates>
     <CompilerItems>

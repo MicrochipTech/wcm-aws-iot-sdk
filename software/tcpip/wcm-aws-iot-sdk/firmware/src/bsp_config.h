@@ -8,12 +8,12 @@
     bsp_config.h
 
   Summary:      
-    Board Support Package Header file for WCM Development Kit 1.
+    Board Support Package Header file for IoT Wi-Fi G AWS IoT Starter Kit.
 
   Description:
     This file contains constants, macros, type defintions and function
-    declarations required by the Explorer 16 Development Board when used with a
-    PIC32MX795F512L PIM.
+    declarations required by the IoT Wi-Fi G AWS IoT Starter Kit
+ 
 *******************************************************************************/
 
 // DOM-IGNORE-BEGIN
