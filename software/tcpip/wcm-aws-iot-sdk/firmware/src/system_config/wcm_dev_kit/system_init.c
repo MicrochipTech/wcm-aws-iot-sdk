@@ -76,7 +76,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #pragma config FPBDIV =     DIV_1
 #pragma config FCKSM =      CSDCMD
 #pragma config WDTPS =      PS1048576
-#pragma config FWDTEN =     ON
+#pragma config FWDTEN =     OFF
 
 /*** DEVCFG2 ***/
 
