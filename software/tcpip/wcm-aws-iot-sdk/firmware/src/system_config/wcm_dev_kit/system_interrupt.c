@@ -82,7 +82,11 @@ void __ISR(_EXTERNAL_0_VECTOR, ipl3AUTO) _InterruptHandler_MRF24W_Ext0(void)
     DRV_WIFI_MRF24W_ISR((SYS_MODULE_OBJ)0);
 }
 
+void __ISR(_FCE_VECTOR, ipl3AUTO) _IntHandlerDrvNvm (void)
+{
+    DRV_NVM_Tasks(sysObj.drvNvm);
 
+}
 
  
 /*******************************************************************************

@@ -114,7 +114,7 @@ void BSP_Initialize(void )
     PLIB_PORTS_PinClear( PORTS_ID_0, PORT_CHANNEL_E, BSP_BOOST_EN );
 
     /* Initialize the LED light show value and switch states*/
-    bspData.light_show      = BSP_LED_CONNECTING_TO_AP;
+    bspData.light_show      = BSP_LED_EASY_CONFIGURATION;
     bspData.previousStateS1 = BSP_SWITCH_STATE_DEASSERTED;
     bspData.previousStateS2 = BSP_SWITCH_STATE_DEASSERTED;
     bspData.previousStateS3 = BSP_SWITCH_STATE_DEASSERTED;

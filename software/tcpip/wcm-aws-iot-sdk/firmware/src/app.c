@@ -65,7 +65,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#define IOT_WIFI_G_AWS_IOT_STARTER_KIT_APP_VERSION "0.2.0"
+#define IOT_WIFI_G_AWS_IOT_STARTER_KIT_APP_VERSION "0.3.0"
+#define MQTT_KEEP_ALIVE 60
+#define MQTT_PING_REQ 45
+#define MQTT_PING_RESP_TIMEOUT 10
 
 // *****************************************************************************
 /* Application Data
@@ -85,6 +88,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 APP_DATA appData;
 extern BSP_DATA bspData;
 
+extern bool g_scan_done; // WF_PRESCAN    This will be set wheneven event scan results are ready.
+extern bool g_prescan_waiting; // WF_PRESCAN    This is used only to allow prescan once.
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Callback Functions
@@ -99,6 +104,9 @@ extern BSP_DATA bspData;
 // Section: Application Local Functions
 // *****************************************************************************
 // *****************************************************************************
+bool APP_NVM_EraseConfig(void);
+bool APP_NVM_ReadConfig(void);
+bool APP_NVM_WriteConfig(void);
 
 /* TODO:  Add any necessary local functions.
 */
@@ -142,8 +150,7 @@ void APP_Initialize ( void )
     appData.state = APP_STATE_INIT;
     
     // Your AWS IoT Service Host
-    const char * host = "endpoint.example.com\0";
-    strncpy((char *)&appData.aws_iot_host, host, strlen(host));
+    memset(appData.aws_iot_host, '\0', sizeof(appData.aws_iot_host));
     appData.port = 8883;
     appData.tcpipTimeout = 0;
     init_queue(&appData.myQueue);
@@ -175,7 +182,7 @@ void APP_Tasks ( void )
     
     // Unique client ID for each MQTT connection
     data.clientID.cstring = "000001iot";
-	data.keepAliveInterval = 60;
+	data.keepAliveInterval = MQTT_KEEP_ALIVE;
 	data.cleansession = 1;
     
     // To Shadow Topic
@@ -244,8 +251,45 @@ void APP_Tasks ( void )
         /* Application's initial state. */
         case APP_STATE_INIT:
         {
-            appData.state = APP_TCPIP_WAIT_FOR_TCPIP_INIT;
+            appData.state = APP_NVM_MOUNT_DISK;
             break;        
+        }
+        
+        case APP_NVM_MOUNT_DISK:
+        {
+            if(SYS_FS_Mount(SYS_FS_NVM_VOL, LOCAL_WEBSITE_PATH_FS, MPFS2, 0, NULL)  == 0)
+            {
+                appData.state = APP_NVM_ERASE_SERVER;
+            }
+            else
+            {
+                ; // Continue, NVM is mounting...
+            }
+            break;
+        }
+        
+        /* Erase server configuration if needed */
+        case APP_NVM_ERASE_SERVER:
+        {
+            // If switch 2 and switch 3 are pressed, then we erase the server from NVM
+            if( (BSP_SwitchStateGet(BSP_SWITCH_3) == BSP_SWITCH_STATE_ASSERTED) && (BSP_SwitchStateGet(BSP_SWITCH_2) == BSP_SWITCH_STATE_ASSERTED) )
+            {
+                APP_NVM_EraseConfig();
+                DRV_WIFI_ConfigDataErase(); // Erase the stored config
+                DRV_WIFI_ConfigDataLoad();  // Load the erased data to clear out initialized config
+                BSP_LED_LightShowSet(BSP_LED_EASY_CONFIGURATION);
+            }
+            appData.state = APP_NVM_GET_SERVER;
+            break;
+        }
+        
+        /* Read server address from NVM */
+        case APP_NVM_GET_SERVER:
+        {     
+            if(APP_NVM_ReadConfig() != true)
+                break;  
+            appData.state = APP_TCPIP_WAIT_FOR_TCPIP_INIT;
+            break;
         }
         
         // Wait for the TCPIP stack to be initialized
@@ -260,8 +304,63 @@ void APP_Tasks ( void )
             }
             else if(tcpipStat == SYS_STATUS_READY)
             {
-                appData.state = APP_TCPIP_WAIT_FOR_IP;
+                if (p_wifi_ConfigData->networkType == DRV_WIFI_NETWORK_TYPE_SOFT_AP)
+                {
+                    // Retrieve MAC address and store it into app data to be used later
+                    uint8_t v[6];
+                    DRV_WIFI_MacAddressGet((uint8_t *)(v));
+                    sprintf(appData.uuid, "%02x%02x%02x", v[3], v[4], v[5]); // convert to string
+                    //Set the SSID for SoftAP mode to have the last 6 digits of mac address
+                    sprintf((char *)p_wifi_ConfigData->netSSID,"%02x%02x%02x_IoT", v[3], v[4], v[5]);
+                    appData.state = APP_WIFI_WAIT_FOR_SCAN;
+                }
+                else
+                {
+                    BSP_LED_LightShowSet(BSP_LED_CONNECTING_TO_AP);
+                    appData.state = APP_TCPIP_WAIT_FOR_IP;
+                }
                 APP_TIMER_Set(&appData.tcpipTimeout);
+            }
+            break;
+        }
+        
+        case APP_WIFI_WAIT_FOR_SCAN:
+        {
+            if (g_scan_done)
+            {
+                if (g_prescan_waiting)
+                {
+                    if(IS_SCAN_STATE_DISPLAY(SCANCXT.scanState) && (SCANCXT.numScanResults > 0))
+                    { 
+                        // Display scan results on console if needed
+                        SCANCXT.displayIdx = 0;
+                        appData.state = APP_TCPIP_WIFI_CONNECT;
+                    }
+                    else if (IS_SCAN_STATE_DISPLAY(SCANCXT.scanState) && (SCANCXT.numScanResults == 0))
+                    {
+                        // No AP Found - Add in console messages if needed
+                        appData.state = APP_TCPIP_WIFI_CONNECT;
+                    }
+                    else
+                    {
+                        // Prescan Failed - Add in console messages if needed
+                        appData.state = APP_TCPIP_WIFI_CONNECT;
+                    }
+                    g_prescan_waiting = false;
+                }
+            }
+            break;
+        }
+            
+        case APP_TCPIP_WIFI_CONNECT:
+        {
+            #if (WF_DEFAULT_NETWORK_TYPE == DRV_WIFI_NETWORK_TYPE_SOFT_AP) && (WF_SOFTAP_CHECK_LINK_STATUS == DRV_WIFI_ENABLED)
+                DRV_WIFI_SetLinkDownThreshold(WF_SOFTAP_LINK_FAILURE_THRESHOLD);
+            #endif
+
+            if (DRV_WIFI_ConnectStateMachine() == TCPIP_MAC_RES_OK)
+            {
+                appData.state = APP_TCPIP_WAIT_FOR_IP;
             }
             break;
         }
@@ -272,10 +371,7 @@ void APP_Tasks ( void )
             int                 i, nNets;
             TCPIP_NET_HANDLE    netH;
             IPV4_ADDR           ipAddr;
-            // if the IP address of an interface has changed
-            // display the new value on the system console
             nNets = TCPIP_STACK_NumberOfNetworksGet();
-
             if(APP_TIMER_Expired(&appData.tcpipTimeout, 10))
             {
                 APP_TIMER_Set(&appData.tcpipTimeout);
@@ -291,12 +387,40 @@ void APP_Tasks ( void )
                 {
                     if (ipAddr.v[0] != 0 && ipAddr.v[0] != 169) // Wait for a Valid IP
                     {
-                        BSP_LED_LightShowSet(BSP_LED_AP_CONNECTED);
-                        appData.state = APP_TCPIP_RESOLVE_DNS;
+                        appData.state = APP_TCPIP_CONFIGURATION;
                     }
                 }
             } 
            
+            break;
+        }
+        
+        case APP_TCPIP_CONFIGURATION:
+        {
+            if(p_wifi_ConfigData->networkType == DRV_WIFI_NETWORK_TYPE_SOFT_AP)
+            {
+                break;
+            }
+            else
+            {
+                // Write the server we retrieved from user
+                if (APP_NVM_WriteConfig() != true)
+                {
+                    break;
+                }
+                else
+                {
+                    TCPIP_NET_HANDLE    netH;
+                    int i, nNets;
+
+                    nNets = TCPIP_STACK_NumberOfNetworksGet();
+                    for (i = 0; i < nNets; i++)
+                    {
+                        netH = TCPIP_STACK_IndexToNet(i);
+                    }
+                    appData.state = APP_TCPIP_RESOLVE_DNS;  
+                }       
+            }
             break;
         }
         
@@ -321,7 +445,7 @@ void APP_Tasks ( void )
         case APP_TCPIP_WAIT_DNS:
         {
             // If it takes longer than 10 seconds to resolve domain name, timeout
-            if(APP_TIMER_Expired(&appData.tcpipTimeout, 10))
+            if(APP_TIMER_Expired(&appData.tcpipTimeout, 5))
             {
                 BSP_LED_LightShowSet(BSP_LED_DNS_FAILED);
                 appData.state = APP_TCPIP_RESOLVE_DNS;
@@ -349,7 +473,7 @@ void APP_Tasks ( void )
         {
             // Domain name is resolved into IP address, now we open a socket
             // Default port is 8883 for MQTT over SSL
-            appData.socket = NET_PRES_SKT_Open(0, NET_PRES_SKT_ENCRYPTED_STREAM_CLIENT, IP_ADDRESS_TYPE_IPV4, 8883, (NET_PRES_ADDRESS *)&appData.aws_iot_ipv4, &appData.error);
+            appData.socket = NET_PRES_SKT_Open(0, NET_PRES_SKT_ENCRYPTED_STREAM_CLIENT, IP_ADDRESS_TYPE_IPV4, appData.port, (NET_PRES_ADDRESS *)&appData.aws_iot_ipv4, &appData.error);
             NET_PRES_SKT_WasReset(appData.socket, &appData.error);
             if(appData.socket == INVALID_SOCKET)
             {
@@ -396,7 +520,13 @@ void APP_Tasks ( void )
             // At this point we have an SSL encrypted socket to the AWS IoT service
             // Lets send our current LED status
             BSP_LED_LightShowSet(BSP_LED_ALL_GOOD);
+            appData.led1 ? BSP_LEDOn(BSP_LED_1) : BSP_LEDOff(BSP_LED_1);
+            appData.led2 ? BSP_LEDOn(BSP_LED_2) : BSP_LEDOff(BSP_LED_2);
+            appData.led3 ? BSP_LEDOn(BSP_LED_3) : BSP_LEDOff(BSP_LED_3);
+            appData.led4 ? BSP_LEDOn(BSP_LED_4) : BSP_LEDOff(BSP_LED_4);
+            
             MY_QUEUE_OBJECT currentLeds = {false, false, false, false, false, true, true, true, true};
+            
             enqueue((&appData.myQueue), currentLeds);
             appData.state = APP_TCPIP_MQTT_CONNECT;
             break;
@@ -487,13 +617,13 @@ void APP_Tasks ( void )
             // Send packet to network TX buffer to be sent
             NET_PRES_SKT_Write(appData.socket, (uint8_t*)buf, len, &error);
             appData.state = APP_TCPIP_MQTT_SUBACK;
-            APP_TIMER_Set(&appData.mqttPingTimer);
+            APP_TIMER_Set(&appData.mqttMessageTimer);
             break;
         }
         
         case APP_TCPIP_MQTT_SUBACK:
         {
-            if(APP_TIMER_Expired(&appData.mqttPingTimer, 20))
+            if(APP_TIMER_Expired(&appData.mqttMessageTimer, 20))
             {
                 BSP_LED_LightShowSet(BSP_LED_SERVER_CONNECT_FAILED);
                 appData.state = APP_TCPIP_ERROR;
@@ -554,7 +684,7 @@ void APP_Tasks ( void )
                 break;   
             }
             
-            if(APP_TIMER_Expired(&appData.mqttPingTimer, 45))
+            if(APP_TIMER_Expired(&appData.mqttPingTimer, MQTT_PING_REQ))
             {
                 APP_TIMER_Set(&appData.mqttPingTimer);
                 appData.state = APP_TCPIP_MQTT_PINGREQ;
@@ -592,7 +722,12 @@ void APP_Tasks ( void )
 			int rc;
 			MQTTString receivedTopic;
             // Read network RX buffer for publishes
-            uint16_t res = NET_PRES_SKT_Read(appData.socket, (uint8_t*)buf, sizeof(buf), &error);
+            int16_t res = NET_PRES_SKT_Read(appData.socket, (uint8_t*)buf, sizeof(buf), &error);
+            if(res < 0)
+            {
+               appData.state = APP_TCPIP_ERROR;
+               break;  
+            }
             if(error != NET_PRES_SKT_OK)
             {
                 appData.state = APP_TCPIP_ERROR;
@@ -623,7 +758,7 @@ void APP_Tasks ( void )
                 break;
             }
              
-             if(NET_PRES_SKT_WriteIsReady(appData.socket, &error) == 0)
+            if(NET_PRES_SKT_WriteIsReady(appData.socket, &error) == 0)
             {
                 break;
             }
@@ -636,7 +771,7 @@ void APP_Tasks ( void )
         case APP_TCPIP_MQTT_PINGRESP:
         {   
             // Wait for PINGRESP from service
-             if(APP_TIMER_Expired(&appData.mqttPingTimer, 15))
+             if(APP_TIMER_Expired(&appData.mqttPingTimer, MQTT_PING_RESP_TIMEOUT))
             {
                 APP_TIMER_Set(&appData.mqttPingTimer);
                 appData.state = APP_TCPIP_ERROR;
@@ -658,18 +793,14 @@ void APP_Tasks ( void )
                 break;
             }
             
-            if (NET_PRES_SKT_ReadIsReady(appData.socket,&error) == 0)
-            {
-                if (NET_PRES_SKT_WasReset(appData.socket, &error))
-                {
-                    appData.state = APP_TCPIP_ERROR;
-                }
-                break;
-            }
-            
             uint16_t res = NET_PRES_SKT_Read(appData.socket, (uint8_t*)buf, sizeof(buf), &error);
-            appData.state = APP_TCPIP_MQTT_IDLE;
-            BSP_LEDOff(BSP_LED_6);
+            int rc = MQTTDeserialize_pingresp((uint8_t*)buf, sizeof(buf));
+            if(rc == 1)
+            {
+                APP_TIMER_Set(&appData.mqttPingTimer);
+                appData.state = APP_TCPIP_MQTT_IDLE;
+                BSP_LEDOff(BSP_LED_6);
+            }
             break;
         }
 
@@ -858,6 +989,174 @@ void handler_topic_delta(unsigned char * payload)
     {
         enqueue((&appData.myQueue), publishObject);
     }   
+}
+
+bool APP_NVM_EraseConfig(void)
+{
+    int tmp;
+    
+    appData.nvmHandle = DRV_NVM_Open(0, DRV_IO_INTENT_READWRITE);
+    if(DRV_HANDLE_INVALID == appData.nvmHandle)
+    {
+        return false;
+    }
+
+    appData.gAppNVMMediaGeometry = DRV_NVM_GeometryGet(appData.nvmHandle);
+    if(NULL ==appData. gAppNVMMediaGeometry)
+    {
+        return false;
+    }  
+
+    tmp = DRV_SERVER_NVM_SPACE_ADDR * (appData.gAppNVMMediaGeometry->geometryTable[2].numBlocks) / (DRV_NVM_MEDIA_SIZE * 1024);
+    
+    DRV_NVM_Erase(appData.nvmHandle, &appData.nvmCommandHandle,  tmp, 1);
+    if(appData.nvmCommandHandle == DRV_NVM_COMMAND_HANDLE_INVALID)
+    {
+        return false;
+    }
+
+    if(DRV_NVM_COMMAND_COMPLETED == DRV_NVM_CommandStatus(appData.nvmHandle, appData.nvmCommandHandle))
+    {
+        DRV_NVM_Close(appData.nvmHandle);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool APP_NVM_ReadConfig(void)
+{
+    static uint8_t state_read = 0;
+    
+    switch (state_read)
+    {
+        case 0:
+        {
+            appData.nvmHandle = DRV_NVM_Open(0, DRV_IO_INTENT_READWRITE);
+            if(DRV_HANDLE_INVALID == appData.nvmHandle)
+            {
+                return false;
+            }
+            
+            appData.gAppNVMMediaGeometry = DRV_NVM_GeometryGet(appData.nvmHandle);
+            if(NULL == appData.gAppNVMMediaGeometry)
+            {
+                return false;
+            }
+
+            DRV_NVM_Read(appData.nvmHandle, &appData.nvmCommandHandle, appData.aws_iot_host, DRV_SERVER_NVM_SPACE_ADDR, sizeof(appData.aws_iot_host));
+            if(DRV_NVM_COMMAND_HANDLE_INVALID == appData.nvmCommandHandle)
+            {
+                return false;
+            }    
+            
+            state_read = 1;
+            return false;
+        }
+
+        case 1:
+        {
+            if(DRV_NVM_COMMAND_COMPLETED == DRV_NVM_CommandStatus(appData.nvmHandle, appData.nvmCommandHandle))
+            {
+                DRV_NVM_Close(appData.nvmHandle);
+                state_read = 0;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    return false;
+}
+
+bool APP_NVM_WriteConfig(void)
+{   
+    static uint8_t state_write = 0;
+    int tmp;
+                
+    switch (state_write)
+    {
+        case 0:
+        {
+            appData.nvmHandle = DRV_NVM_Open(0, DRV_IO_INTENT_READWRITE);
+            if(DRV_HANDLE_INVALID == appData.nvmHandle){
+                return false;
+            }
+
+            appData.gAppNVMMediaGeometry = DRV_NVM_GeometryGet(appData.nvmHandle);
+            if(NULL ==appData. gAppNVMMediaGeometry){
+                return false;
+            }  
+
+            tmp = DRV_SERVER_NVM_SPACE_ADDR * (appData.gAppNVMMediaGeometry->geometryTable[2].numBlocks) / (DRV_NVM_MEDIA_SIZE * 1024);
+            DRV_NVM_Erase(appData.nvmHandle, &appData.nvmCommandHandle,  tmp, 1);
+            if(appData.nvmCommandHandle == DRV_NVM_COMMAND_HANDLE_INVALID){
+                return false;
+            }
+            state_write = 1;
+            return false;
+        }
+
+        case 1:
+        {
+            if(DRV_NVM_COMMAND_COMPLETED == DRV_NVM_CommandStatus(appData.nvmHandle, appData.nvmCommandHandle))
+            {
+                state_write = 2;
+                return false;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        case 2:
+        {
+            tmp = DRV_SERVER_NVM_SPACE_ADDR * (appData.gAppNVMMediaGeometry->geometryTable[1].numBlocks) / (DRV_NVM_MEDIA_SIZE * 1024);
+            DRV_NVM_Write(appData.nvmHandle, &appData.nvmCommandHandle, (uint8_t *)appData.aws_iot_host, tmp, 1);
+            if(DRV_NVM_COMMAND_HANDLE_INVALID == appData.nvmCommandHandle)
+            {
+                return false;
+            }
+            else
+            {
+                state_write = 3;
+            }
+        }
+        
+        case 3:
+        {
+            if(DRV_NVM_COMMAND_COMPLETED == DRV_NVM_CommandStatus(appData.nvmHandle, appData.nvmCommandHandle))
+            {
+                DRV_NVM_Close(appData.nvmHandle);
+                state_write = 0;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+    }
+    return false;
+}
+
+int MQTTDeserialize_pingresp(unsigned char* buf, int buflen)
+{
+    unsigned char* curdata = buf;
+	int rc = 0;
+    MQTTHeader header = {0};
+
+    header.byte = readChar(&curdata);
+	if (header.bits.type != PINGRESP)
+		return 0;
+    else
+        return 1;
 }
 /*******************************************************************************
  End of File

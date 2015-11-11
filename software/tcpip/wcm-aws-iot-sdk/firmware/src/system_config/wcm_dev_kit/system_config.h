@@ -105,6 +105,30 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define SYS_TMR_CLIENT_TOLERANCE        10
 #define SYS_TMR_INTERRUPT_NOTIFICATION  false
 
+
+/*** File System Service Configuration ***/
+
+#define SYS_FS_MEDIA_NUMBER         	1
+
+#define SYS_FS_VOLUME_NUMBER		1
+
+#define SYS_FS_AUTOMOUNT_ENABLE		false
+#define SYS_FS_MAX_FILES	    	25
+#define SYS_FS_MAX_FILE_SYSTEM_TYPE 	1
+#define SYS_FS_MEDIA_MAX_BLOCK_SIZE  	512
+#define SYS_FS_MEDIA_MANAGER_BUFFER_SIZE 512
+
+
+#define SYS_FS_MEDIA_TYPE_IDX0 				
+#define SYS_FS_TYPE_IDX0 					
+
+
+
+
+
+
+
+
 // *****************************************************************************
 /* Random System Service Configuration Options
 */
@@ -138,6 +162,33 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
  
  
+/*** NVM Driver Configuration ***/
+
+
+#define DRV_NVM_INSTANCES_NUMBER     	1
+#define DRV_NVM_CLIENTS_NUMBER        	3
+#define DRV_NVM_BUFFER_OBJECT_NUMBER  	5
+
+#define DRV_NVM_INTERRUPT_MODE        	true
+#define DRV_NVM_INTERRUPT_SOURCE      	INT_SOURCE_FLASH_CONTROL
+
+#define DRV_NVM_MEDIA_SIZE              24
+#define DRV_NVM_MEDIA_START_ADDRESS     0x9D000000
+
+#define DRV_NVM_ROW_SIZE                512
+#define DRV_NVM_PAGE_SIZE             	4096
+#define DRV_NVM_PROGRAM_UNLOCK_KEY1     0xAA996655
+#define DRV_NVM_PROGRAM_UNLOCK_KEY2     0x556699AA
+
+#define DRV_NVM_ERASE_WRITE_ENABLE
+
+
+#define DRV_NVM_SYS_FS_REGISTER
+
+
+
+
+
 /*** SPI Driver Configuration ***/
 #define DRV_SPI_NUMBER_OF_MODULES		3
 /*** Driver Compilation and static configuration options. ***/
@@ -180,6 +231,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define DRV_WIFI_SPI_INDEX 0
 #define DRV_WIFI_SPI_INSTANCE sysObj.spiObjectIdx0
 
+#define DRV_WIFI_NVM_SPACE_ENABLE
+#define DRV_WIFI_NVM_SPACE_ADDR (20*1024)
+#define DRV_SERVER_NVM_SPACE_ADDR (16*1024)
+
 #define MRF_INT_SOURCE INT_SOURCE_EXTERNAL_0
 #define MRF_INT_VECTOR INT_VECTOR_INT0
 
@@ -197,23 +252,24 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define WF_INT_PORT_CHANNEL PORT_CHANNEL_D
 #define WF_INT_BIT_POS 0
 
-#define WF_DEFAULT_NETWORK_TYPE        DRV_WIFI_NETWORK_TYPE_INFRASTRUCTURE
-#define WF_DEFAULT_SSID_NAME            "Your AP Here"
-#define WF_DEFAULT_LIST_RETRY_COUNT    (DRV_WIFI_RETRY_FOREVER) /* Number (1..255) of times to try to connect to the SSID when using Infrastructure network type */
-#define WF_DEFAULT_CHANNEL_LIST        {} /* Channel list for Domain - use default in module */
+#define WF_DEFAULT_NETWORK_TYPE        DRV_WIFI_NETWORK_TYPE_SOFT_AP
+#define WF_DEFAULT_SSID_NAME           "xxxxxx_IoT"
+#define WF_DEFAULT_LIST_RETRY_COUNT    (DRV_WIFI_RETRY_ADHOC) /* Dummy, not used */
+#define WF_DEFAULT_CHANNEL_LIST        {6}                    /* Set SoftAP network channel */
 
-#define WF_DEFAULT_WIFI_SECURITY_MODE  DRV_WIFI_SECURITY_WPA_AUTO_WITH_PASS_PHRASE
-//#define WF_DEFAULT_WIFI_SECURITY_MODE  DRV_WIFI_SECURITY_OPEN
+#define WF_DEFAULT_WIFI_SECURITY_MODE  DRV_WIFI_SECURITY_OPEN
 #define WF_DEFAULT_WEP_PHRASE          "WEP Phrase" // default WEP passphrase
 #define WF_DEFAULT_WEP_KEY_40          "5AFB6C8E77" // default WEP40 key
 #define WF_DEFAULT_WEP_KEY_104         "90E96780C739409DA50034FCAA" // default WEP104 key
-#define WF_DEFAULT_PSK_PHRASE           "Your Passphrase Here"
+#define WF_DEFAULT_PSK_PHRASE          "Microchip 802.11 Secret PSK Password" // default WPA passphrase
 #define WF_DEFAULT_WPS_PIN             "12390212" // default WPS PIN
 
 #define WF_SAVE_WPS_CREDENTIALS        DRV_WIFI_DISABLED
 
 #define WF_CHECK_LINK_STATUS           WF_DISABLED /* Gets the MRF to check the link status relying on Tx failures. */
 #define WF_LINK_LOST_THRESHOLD         40          /* Consecutive Tx transmission failures to be considered the AP is gone away. */
+#define WF_SOFTAP_SEND_KEEP_ALIVE      WF_DISABLED /* Gets SoftAP to send keep alive packets to clients. */
+#define WF_SOFTAP_LINK_LOST_THRESHOLD  40          /* Consecutive null packet transmission failures to be considered the client STA is gone away. */
 
 /* 
  * MRF24W FW has a built-in connection manager, and it is enabled by default.
@@ -226,9 +282,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  */
 #define WF_MODULE_CONNECTION_MANAGER   DRV_WIFI_ENABLED
 
-#define WF_DEFAULT_PS_POLL             DRV_WIFI_DISABLED /* DRV_WIFI_ENABLED or DRV_WIFI_DISABLED */
+#define WF_DEFAULT_PS_POLL             DRV_WIFI_DISABLED /* PS_POLL not supported in SoftAP - must be set to DRV_WIFI_DISABLED */
 #define WF_SOFTWARE_MULTICAST_FILTER   DRV_WIFI_ENABLED
 
+#define WF_ENABLE_STATIC_IP
 
 
 // *****************************************************************************
@@ -285,6 +342,33 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define TCPIP_DHCP_CLIENT_ENABLED             			true
 
 
+/*** DHCP Server Configuration ***/
+#define TCPIP_STACK_USE_DHCP_SERVER
+#define TCPIP_DHCPS_TASK_PROCESS_RATE                               200
+#define TCPIP_DHCPS_LEASE_ENTRIES_DEFAULT                           15
+#define TCPIP_DHCPS_LEASE_SOLVED_ENTRY_TMO                          1200
+#define TCPIP_DHCPS_LEASE_REMOVED_BEFORE_ACK                        5
+#define TCPIP_DHCP_SERVER_DELETE_OLD_ENTRIES                        true
+#define TCPIP_DHCPS_LEASE_DURATION	TCPIP_DHCPS_LEASE_SOLVED_ENTRY_TMO
+
+/*** DHCP Server Instance 0 Configuration ***/
+#define TCPIP_DHCPS_DEFAULT_IP_ADDRESS_RANGE_START_IDX0             "192.168.1.100"
+
+#define TCPIP_DHCPS_DEFAULT_SERVER_IP_ADDRESS_IDX0                  "192.168.1.1"
+
+#define TCPIP_DHCPS_DEFAULT_SERVER_NETMASK_ADDRESS_IDX0             "255.255.255.0"
+
+#define TCPIP_DHCPS_DEFAULT_SERVER_GATEWAY_ADDRESS_IDX0             "192.168.1.1"
+
+#define TCPIP_DHCPS_DEFAULT_SERVER_PRIMARY_DNS_ADDRESS_IDX0         "192.168.1.1"
+
+#define TCPIP_DHCPS_DEFAULT_SERVER_SECONDARY_DNS_ADDRESS_IDX0       "192.168.1.1"
+
+#define TCPIP_DHCP_SERVER_INTERFACE_INDEX_IDX0                      0
+
+#define TCPIP_DHCP_SERVER_POOL_ENABLED_IDX0                         true
+
+
 
 /*** DNS Client Configuration ***/
 #define TCPIP_STACK_USE_DNS
@@ -304,6 +388,25 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 
 
+/*** HTTP Configuration ***/
+#define TCPIP_STACK_USE_HTTP_SERVER
+#define TCPIP_HTTP_MAX_HEADER_LEN		    		15
+#define TCPIP_HTTP_CACHE_LEN		        		"600"
+#define TCPIP_HTTP_TIMEOUT		            		45
+#define TCPIP_HTTP_MAX_CONNECTIONS		    		1
+#define TCPIP_HTTP_MAX_TLS_CONNECTIONS		  		0
+#define TCPIP_HTTP_DEFAULT_FILE		        		"index.htm"
+#define TCPIP_HTTPS_DEFAULT_FILE	        		"index.htm"
+#define TCPIP_HTTP_DEFAULT_LEN		        		10
+#define TCPIP_HTTP_MAX_DATA_LEN		        		100
+#define TCPIP_HTTP_MIN_CALLBACK_FREE				16
+#define TCPIP_HTTP_SKT_TX_BUFF_SIZE		    		0
+#define TCPIP_HTTP_SKT_RX_BUFF_SIZE		    		0
+#define TCPIP_HTTP_TLS_SKT_TX_BUFF_SIZE		                0
+#define TCPIP_HTTP_TLS_SKT_RX_BUFF_SIZE		                0
+#define TCPIP_HTTP_CONFIG_FLAGS		        		1
+#define TCPIP_HTTP_USE_POST
+#define TCPIP_HTTP_TASK_RATE					33
 
 
 
@@ -386,6 +489,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define TCPIP_NETWORK_DEFAULT_IPV6_GATEWAY 		        0
 
 
+/*** TCPIP SYS FS Wrapper ***/
+#define SYS_FS_MAX_PATH						80
+#define LOCAL_WEBSITE_PATH_FS				"/mnt/mchpSite1"
+#define LOCAL_WEBSITE_PATH					"/mnt/mchpSite1/"
+#define SYS_FS_DRIVE						"FLASH"
+#define SYS_FS_NVM_VOL						"/dev/nvma1"
+#define SYS_FS_FATFS_STRING					"FATFS"
+#define SYS_FS_MPFS_STRING					"MPFS2"
 
 
 /* MPLAB Harmony Net Presentation Layer Definitions*/

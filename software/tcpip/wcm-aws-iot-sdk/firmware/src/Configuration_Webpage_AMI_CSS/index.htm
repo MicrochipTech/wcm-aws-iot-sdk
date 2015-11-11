@@ -1,0 +1,68 @@
+~inc:header.inc~
+<div id="content">
+	<div class="rounded_container" id="network_config">
+	<div id="column_wrap">
+		<div id="column1">
+			<p align="right">Network SSID:</p>
+			<p align="right">Security Type:</p>
+		    <p id="passwordText" align="right"></p>
+			<p align="right">AWS IoT Endpoint:</p>
+
+		</div>
+		<div id="column2">
+			<p>
+				<input id="ssid1" type="text" class="ssid1" name="ssid1" maxlength="32"></input>
+			</p>
+			<p>
+				<select id="sec1" onchange="passwordInput()" name="sec1" class="sec1">
+            		<option value="0">
+               			 None
+            		</option>
+            		<option value="1">
+               			 WEP
+            		</option>
+            		<option value="5">
+               			 WPA/WPA2 Passphrase
+            		</option>
+        		</select>
+        	</p>
+        	<p>
+        		<input id="passwordInput" type="hidden" name="pwd" maxlength="64" class="ssid1"></input>
+        	</p>
+       		<p>
+				<tr style="width:9em">
+    			<td colspan="1">
+        			<input id="remote_server1" type="text" name="remote_server1" maxlength="255" class="ssid1" value=""></input>
+    			</td>
+				</tr>
+			</p>
+		</div>
+	</div>
+	<input id="joinButton" class="join_button" type="button" value="Join" onclick="joinNetwork();"></input>
+	</div>
+	<form method="post" name="kickoff" action="">
+		<input type="hidden" id="wlan" name="wlan"></input>
+		<input type="hidden" id="ssid" name="ssid"></input>
+		<input type="hidden" id="sec" name="sec"></input>
+		<input type="hidden" id="key" name="key"></input>
+		<input type="hidden" id="rs" name="rs"></input>
+	</form>
+</div>
+<script type="text/javascript">
+function passwordInput() {
+    var x = document.getElementById("sec1").value;
+    if(x == 1) {
+		document.getElementById("passwordInput").type = "password";
+		document.getElementById("passwordText").innerHTML = "Password:";
+	}
+	else if(x == 5) {
+		document.getElementById("passwordInput").type = "password";
+		document.getElementById("passwordText").innerHTML = "Password:";
+	}
+	else {
+		document.getElementById("passwordInput").type = "hidden";
+		document.getElementById("passwordText").innerHTML = "";
+	}
+}
+</script>
+~inc:footer.inc~

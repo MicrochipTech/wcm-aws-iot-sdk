@@ -56,10 +56,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system/clk/sys_clk_static.h"
 #include "system/devcon/sys_devcon.h"
 #include "system/int/sys_int.h"
+#include "system/fs/sys_fs.h"
+#include "system/fs/sys_fs_media_manager.h"
 #include "system/random/sys_random.h"
+#include "system/fs/mpfs/mpfs.h"
 #include "system/tmr/sys_tmr.h"
 #include "system/reset/sys_reset.h"
 #include "driver/tmr/drv_tmr.h"
+#include "driver/nvm/drv_nvm.h"
 #include "system/ports/sys_ports.h"
 #include "driver/spi/drv_spi.h"
 
@@ -72,7 +76,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "net/pres/net_pres_transportapi.h"
 #include "net/pres/net_pres_socketapi.h"
 #include "app.h"
-
 
 
 // DOM-IGNORE-BEGIN
@@ -109,6 +112,7 @@ typedef struct
     SYS_MODULE_OBJ  sysDevcon;
     SYS_MODULE_OBJ  sysTmr;
     SYS_MODULE_OBJ  drvTmr0;
+    SYS_MODULE_OBJ  drvNvm;
 
     /*** SPI Object for Index 0 ***/
     SYS_MODULE_OBJ				spiObjectIdx0;

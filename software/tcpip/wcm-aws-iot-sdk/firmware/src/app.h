@@ -59,6 +59,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "queue.h"
+#include "driver/wifi/mrf24w/src/drv_wifi_config_data.h"
+#include "driver/wifi/mrf24w/src/drv_wifi_easy_config.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -89,8 +91,14 @@ typedef enum
 {
 	/* Application's state machine's initial state. */
 	APP_STATE_INIT=0,
+    APP_NVM_MOUNT_DISK,
+    APP_NVM_ERASE_SERVER,
+    APP_NVM_GET_SERVER,
     APP_TCPIP_WAIT_FOR_TCPIP_INIT,
+    APP_WIFI_WAIT_FOR_SCAN,
+    APP_TCPIP_WIFI_CONNECT,
     APP_TCPIP_WAIT_FOR_IP,
+    APP_TCPIP_CONFIGURATION,
     APP_TCPIP_RESOLVE_DNS,
     APP_TCPIP_DNS_RESOLVED,
     APP_TCPIP_WAIT_DNS,
@@ -132,6 +140,8 @@ typedef struct
     char aws_iot_host[256];
     IP_MULTI_ADDRESS  aws_iot_ipv4;
     NET_PRES_ADDRESS  aws_iot_ipv4test;
+    char uuid[7];
+    
     // Thing Data
     bool switch1;
     bool switch2;
@@ -155,12 +165,19 @@ typedef struct
     uint8_t queryState;
     int8_t cyasslConnectionState;
     NET_PRES_SKT_ERROR_T error;
+    int connection_valid;
     
     // Timers
     uint32_t potTimer;
     uint32_t tcpipTimeout;
     uint32_t mqttPingTimer;
     uint32_t mqttMessageTimer;
+    
+    // Drivers
+    DRV_HANDLE nvmHandle;
+    DRV_NVM_COMMAND_HANDLE      nvmCommandHandle;
+    SYS_FS_MEDIA_GEOMETRY       *gAppNVMMediaGeometry;
+    DRV_NVM_COMMAND_STATUS      nvmStatus;
     
 } APP_DATA;
 

@@ -99,7 +99,7 @@ int WF_InitForSoftApReDirection(void);
 #define WF_WEP_KEY_INVALID 0xff
 
 /* Definitions for stall feature of state machine */
-#define WF_EASY_CONFIG_DELAY_TIME (1ul) /* In seconds */
+#define WF_EASY_CONFIG_DELAY_TIME (3ul) /* In seconds */
 
 /* Scan status/control bits */
 #define SCAN_STATE_IN_PROGRESS  0x0001 /* If scan is in progress */

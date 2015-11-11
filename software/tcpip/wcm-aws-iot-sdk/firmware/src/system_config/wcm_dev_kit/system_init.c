@@ -126,6 +126,49 @@ const DRV_TMR_INIT drvTmr0InitData =
     .asyncWriteEnable = false,
 };
 // </editor-fold>
+//<editor-fold defaultstate="collapsed" desc="DRV_NVM Initialization Data">
+extern const uint8_t NVM_MEDIA_DATA[];
+
+/*** FLASH Driver Initialization Data ***/
+
+SYS_FS_MEDIA_REGION_GEOMETRY NVMGeometryTable[3] = 
+{
+    {
+        .blockSize = 1,
+        .numBlocks = (DRV_NVM_MEDIA_SIZE * 1024),
+    },
+    {
+       .blockSize = DRV_NVM_ROW_SIZE,
+       .numBlocks = ((DRV_NVM_MEDIA_SIZE * 1024)/DRV_NVM_ROW_SIZE)
+    },
+    {
+       .blockSize = DRV_NVM_PAGE_SIZE,
+       .numBlocks = ((DRV_NVM_MEDIA_SIZE * 1024)/DRV_NVM_PAGE_SIZE)
+    }
+};
+
+const SYS_FS_MEDIA_GEOMETRY NVMGeometry = 
+{
+    .mediaProperty = SYS_FS_MEDIA_WRITE_IS_BLOCKING,
+    .numReadRegions = 1,
+    .numWriteRegions = 1,
+    .numEraseRegions = 1,
+    .geometryTable = (SYS_FS_MEDIA_REGION_GEOMETRY *)&NVMGeometryTable
+};
+
+const DRV_NVM_INIT drvNvmInit =
+{
+    .moduleInit.sys.powerState = SYS_MODULE_POWER_RUN_FULL,
+    .nvmID = NVM_ID_0,
+    .interruptSource = INT_SOURCE_FLASH_CONTROL,
+
+    .mediaStartAddress = (uintptr_t )NVM_MEDIA_DATA,
+    .nvmMediaGeometry = (SYS_FS_MEDIA_GEOMETRY *)&NVMGeometry
+
+};
+
+
+// </editor-fold>
 //<editor-fold defaultstate="collapsed" desc="DRV_SPI Initialization Data">
  
  /*** SPI Driver Initialization Data ***/
@@ -200,6 +243,18 @@ const TCPIP_TCP_MODULE_CONFIG tcpipTCPInitData =
     .sktRxBuffSize  = TCPIP_TCP_SOCKET_DEFAULT_RX_SIZE,
 };
 
+/*** HTTP Server Initialization Data ***/
+const TCPIP_HTTP_MODULE_CONFIG tcpipHTTPInitData =
+{
+    .nConnections   = TCPIP_HTTP_MAX_CONNECTIONS,
+    .nTlsConnections    = TCPIP_HTTP_MAX_TLS_CONNECTIONS,
+    .dataLen		= TCPIP_HTTP_MAX_DATA_LEN,
+    .sktTxBuffSize	= TCPIP_HTTP_SKT_TX_BUFF_SIZE,
+    .sktRxBuffSize	= TCPIP_HTTP_SKT_RX_BUFF_SIZE,
+    .tlsSktTxBuffSize	= TCPIP_HTTP_TLS_SKT_TX_BUFF_SIZE,
+    .tlsSktRxBuffSize	= TCPIP_HTTP_TLS_SKT_RX_BUFF_SIZE,
+    .configFlags	= TCPIP_HTTP_CONFIG_FLAGS,
+};
 
 /*** SNTP Client Initialization Data ***/
 const TCPIP_SNTP_MODULE_CONFIG tcpipSNTPInitData =
@@ -239,6 +294,27 @@ const TCPIP_MODULE_MAC_MRF24W_CONFIG macMRF24WConfigData ={
 
 
 
+/*** DHCP server initialization data ***/
+TCPIP_DHCPS_ADDRESS_CONFIG DHCP_POOL_CONFIG[]=
+{
+    {
+        .interfaceIndex     = TCPIP_DHCP_SERVER_INTERFACE_INDEX_IDX0,
+        .serverIPAddress    = TCPIP_DHCPS_DEFAULT_SERVER_IP_ADDRESS_IDX0,
+        .startIPAddRange    = TCPIP_DHCPS_DEFAULT_IP_ADDRESS_RANGE_START_IDX0,
+        .ipMaskAddress      = TCPIP_DHCPS_DEFAULT_SERVER_NETMASK_ADDRESS_IDX0,
+        .priDNS             = TCPIP_DHCPS_DEFAULT_SERVER_PRIMARY_DNS_ADDRESS_IDX0,
+        .secondDNS          = TCPIP_DHCPS_DEFAULT_SERVER_SECONDARY_DNS_ADDRESS_IDX0,
+        .poolEnabled        = TCPIP_DHCP_SERVER_POOL_ENABLED_IDX0,
+    },
+};
+const TCPIP_DHCPS_MODULE_CONFIG tcpipDHCPSInitData =
+{
+    .enabled            = true,
+    .deleteOldLease     = TCPIP_DHCP_SERVER_DELETE_OLD_ENTRIES,
+    .leaseEntries       = TCPIP_DHCPS_LEASE_ENTRIES_DEFAULT,
+    .entrySolvedTmo     = TCPIP_DHCPS_LEASE_SOLVED_ENTRY_TMO,
+    .dhcpServer         = (TCPIP_DHCPS_ADDRESS_CONFIG*)DHCP_POOL_CONFIG,
+};
 
 
 /*** DNS Client Initialization Data ***/
@@ -281,10 +357,12 @@ const TCPIP_STACK_MODULE_CONFIG TCPIP_STACK_MODULE_CONFIG_TBL [] =
     {TCPIP_MODULE_UDP,           &tcpipUDPInitData},              // TCPIP_MODULE_UDP,
     {TCPIP_MODULE_TCP,           &tcpipTCPInitData},              // TCPIP_MODULE_TCP,
     {TCPIP_MODULE_DHCP_CLIENT,   &tcpipDHCPInitData},             // TCPIP_MODULE_DHCP_CLIENT,
+    {TCPIP_MODULE_DHCP_SERVER,   &tcpipDHCPSInitData},                           // TCPIP_MODULE_DHCP_SERVER,
     {TCPIP_MODULE_DNS_CLIENT,&tcpipDNSClientInitData}, // TCPIP_MODULE_DNS_CLIENT,
     {TCPIP_MODULE_NBNS,          &tcpipNBNSInitData},                           // TCPIP_MODULE_NBNS
     {TCPIP_MODULE_SNTP,    &tcpipSNTPInitData},                            // TCPIP_MODULE_SNTP,
 
+    {TCPIP_MODULE_HTTP_SERVER,   &tcpipHTTPInitData},              // TCPIP_MODULE_HTTP_SERVER,
     // MAC modules
     {TCPIP_MODULE_MAC_MRF24W, &macMRF24WConfigData},        // TCPIP_MODULE_MAC_MRF24W
 };
@@ -357,6 +435,30 @@ const SYS_DEVCON_INIT sysDevconInit =
 // </editor-fold>
 
 
+//<editor-fold defaultstate="collapsed" desc="SYS_FS Initialization Data">
+
+
+
+/*** File System Initialization Data ***/
+
+const SYS_FS_MEDIA_MOUNT_DATA sysfsMountTable[SYS_FS_VOLUME_NUMBER] = 
+{
+	{NULL}
+};
+
+
+
+const SYS_FS_REGISTRATION_TABLE sysFSInit [ SYS_FS_MAX_FILE_SYSTEM_TYPE ] =
+{
+    {
+        .nativeFileSystemType = MPFS2,
+        .nativeFileSystemFunctions = &MPFSFunctions
+    }
+};
+
+
+
+// </editor-fold>
 /* Net Presentation Layer Data Definitions */
 #include "framework/net/pres/net_pres_enc_glue.h"
 
@@ -446,6 +548,14 @@ void SYS_Initialize ( void* data )
 
  
     sysObj.spiObjectIdx0 = DRV_SPI_Initialize(DRV_SPI_INDEX_0, (const SYS_MODULE_INIT  * const)&drvSpi0InitData);
+    /* Configure the Flash Controller Interrupt Priority */
+    SYS_INT_VectorPrioritySet(INT_VECTOR_FCE, INT_PRIORITY_LEVEL3);
+
+    /* Configure the Flash Controller Interrupt Sub Priority */
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_FCE, INT_SUBPRIORITY_LEVEL0);
+
+    /* Initialize the NVM Driver */
+    sysObj.drvNvm = DRV_NVM_Initialize(DRV_NVM_INDEX_0, (SYS_MODULE_INIT *)&drvNvmInit);
 
     /* Enable MRF24W Interrupt */
     SYS_PORTS_PinDirectionSelect(PORTS_ID_0,
@@ -460,6 +570,7 @@ void SYS_Initialize ( void* data )
 
     /*** TMR Service Initialization Code ***/
     sysObj.sysTmr  = SYS_TMR_Initialize(SYS_TMR_INDEX_0, (const SYS_MODULE_INIT  * const)&sysTmrInitData);
+    SYS_FS_Initialize( (const void *) sysFSInit );
     SYS_RANDOM_Initialize(0, 0);
 
     /* Initialize Middleware */

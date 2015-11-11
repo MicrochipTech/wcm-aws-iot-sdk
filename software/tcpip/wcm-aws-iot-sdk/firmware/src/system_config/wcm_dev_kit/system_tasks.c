@@ -74,6 +74,7 @@ void SYS_Tasks ( void )
 {
     /* Maintain system services */
     SYS_DEVCON_Tasks(sysObj.sysDevcon);
+    SYS_FS_Tasks();
     SYS_TMR_Tasks(sysObj.sysTmr);
     NET_PRES_Tasks(sysObj.netPres);
 
