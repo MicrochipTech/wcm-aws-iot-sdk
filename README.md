@@ -51,7 +51,7 @@ This assumes that you have not installed previous version of Python, awscli, or 
   ```
   pip install --upgrade awscli
   ```
-- To verify the version of the AWS CLI tool installed run the following command and look for verison 1.8.12 or greater:
+- To verify the version of the AWS CLI tool installed run the following command and look for version 1.8.12 or greater:
 
   ```
   aws --version
@@ -77,16 +77,16 @@ You will receive the following back that you will need to add to the firmware in
 - Create and attach the following policy that will allow your thing to publish and subscribe to the AWS IoT service
   - First create a file that will have the policy information in it and save it to you computer:
 
-  ```
-  {
-    "Version": "2012-10-17",
-    "Statement": [{
-      "Effect": "Allow",
-      "Action":["iot:*"],
-      "Resource": ["*"]
-    }]
-  }
-  ```
+    ```
+    {
+      "Version": "2012-10-17",
+      "Statement": [{
+        "Effect": "Allow",
+        "Action":["iot:*"],
+        "Resource": ["*"]
+      }]
+    }
+    ```
   - Load the policy to the AWS IoT services with the following command:
 
     ```
@@ -140,7 +140,7 @@ To get your starter kit up and running, you will have to program the starter kit
 To run the demo follow these instructions:
 
 1. Power on the IoT Wi-FI G AWS IoT Starter Kit by connecting a Mini-USB cable to a power source and changing the power switch on the board to USB
-- The starter kit will create an access point (AP) with an SSID of __xxxxxx_IoT__ where __xxxxxx__ is the last six characters of your starter kit's MAC address
+- The starter kit will create an access point (AP) with an SSID of __xxxxxx_IoT__ where xxxxxx is the last six characters of your starter kit's MAC address
 - Connect to this SSID using your computer or mobile device.
 - Once connected open a browser and enter the IP address `192.168.1.1`
   - This IP address will bring you to the configuration webpage for your starter kit
@@ -151,7 +151,21 @@ To run the demo follow these instructions:
   - The endpoint will have the form `<random-string>.iot.us-east-1.amazonaws.com`
 - Click the __Join__ button and a _Reconnection in Progress_ page will appear showing the network that the starter kit will reconnect to and your AWS IoT Endpoint.
 
-You will see a series of LEDs flash until the board has connected to the AP you setup.  When the starter kit has connected you should see the D6 LED flickering with network traffic letting you know that you can read and set the state of the starter kit as described in the next section.
+You will see a series of LEDs flash until the board has connected to the AP you setup.  When the starter kit has connected you should see the D6 LED flickering with network traffic letting you know that you can read and set the state of the starter kit as described in the next section.  If not, please see the status and error code table below for more information.  For more detailed information please see the [Troubleshooting](#troubleshooting) section.
+
+##### Status and Error Code Table
+ D7  | D6  | D5  | D4  | D3  | D2  | D1  | Diagnostic Report
+:---:|:---:|:---:|:---:|:---:|:---:|:---:|-----
+ -   | 0   | F   | 0   | 0   | 0   | 0   | Configuration Mode: Need to configure Connected to AP
+ -   | F   | F   | 0   | 0   | 0   | 0   | Connected to AP and waiting on data
+ -   | 1   | 0   | C   | C   | C   | C   | Associating to AP
+ -   | 1   | 1   | 0   | 0   | 0   | 1   | Connection Issue, no internet found
+ -   | 1   | 1   | 0   | 0   | 1   | 0   | Association to AP failed
+ -   | 1   | 1   | 0   | 1   | 0   | 1   | DNS Unresolved: Bad endpoint or no connection
+ -   | F   | 0   | -   | -   | -   | -   | Normal Operation: D6 flashes each message transmission
+ -   | 0   | F   | -   | -   | -   | -   | Normal Operation: D5 flashes each subscription receive
+ 1   | -   | -   | -   | -   | -   | -   | Battery Voltage Low
+F = Flashing, C = Rotating in a counter clockwise pattern, - = Don’t care, 0 = Off, and 1 = On
 
 > NOTE: If you need to change the local network and AWS IoT Endpoint you entered, or if you entered it incorrectly and need to redo the process, simply power off the starter kit, press and hold S2 and S3 while turning on the power to the starter kit.  This will erase the current configuration and you can begin this process again and re-enter the network information and AWS IoT Endpoint.
 
@@ -275,3 +289,21 @@ The AWS IoT will return a JSON payload that show you have changed the desired st
   "timestamp": 1444184928
 }
 ```
+
+---
+
+### Troubleshooting
+If you are having trouble connecting with the starter kit, check to make sure that each of the issues bellow are resolved.
+
+#### Connection Issue
+- Check that you have a valid internet connection on your access point.
+- Ensure that port 8883 is open on your access point.
+- Ensure that your AWS IoT service is setup property.
+
+#### Association to AP Failed
+- Check that the SSID name and passphrase you configured your starter kit with is correct.
+- Check that your access point is not blocking MAC addresses.
+
+#### DNS Resolved Failed
+- Check that the AWS Endpoint you configured your starter kit with is correct.
+- Check that you have a valid internet connection on your access point
