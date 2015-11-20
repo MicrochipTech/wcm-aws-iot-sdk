@@ -70,10 +70,23 @@ You will receive the following back that you will need to add to the firmware in
 - Create certificates that will be used in the application firmware by running the following command in your terminal/command prompt window:
 
   ```
-  aws iot create-keys-and-certificate --set-as-active
+  aws iot create-keys-and-certificate --set-as-active --output text
   ```
   > You will need to copy the output on the terminal/command window to text files for the certs and private key.
-  > NOTE: this is the only time that you will be able to see this information
+  >
+  > NOTE: this is the only time that you will be able to see this information and make sure there is no text or spaces at the beginning of each of the files you create.  For example in the output below you will need to remove the `KEYPAIR` text and spaces so that the first line of the private key starts with the dashes:
+  >
+  >```
+  >...
+  >Gmh/2ib2NsA8Tf+8drTQXf3gQ4oemdOfnA4IlXiFGA9QAP9i/krzYvaVAlSogLWh
+  >wRHaP1hzPuS9+0UjZkS1Uzyfqmd+vR4Om8S+t2VmEwYMJMG3mUaFXdhBhMDJ
+  >-----END CERTIFICATE-----
+  >
+  >KEYPAIR  -----BEGIN RSA PRIVATE KEY-----
+  >MIIEpAIBAAKCAQEAynvp1r7jl9HzbAVCgVWzYmKu4O6nNM4wBZQ1YjHpSOL1+joF
+  >KKcXM8eS8jmUbHRJ84JeDrr9A50ok1cyUCDBPkf6c7VO4xWGzXruR3WoVjRYq3vc
+  >...
+  >```
 - Create and attach the following policy that will allow your thing to publish and subscribe to the AWS IoT service
   - First create a file that will have the policy information in it and save it to you computer:
 
@@ -106,20 +119,8 @@ You will receive the following back that you will need to add to the firmware in
 ---
 ### IoT Wi-Fi G AWS IoT Starter Kit Firmware Setup
 
-#### Certificate Conversion
-You will have generated a client certificate and a client private key that will be used on the starter kit.  The certificate and key generated from the AWS IoT Service Setup section must be encoded in DER format and renamed as such: _clientKey.der_, _clientCert.der_. These must be converted to byte arrays so that it can be used by the board.
-
-1. Place these certificates and key into the folder:
-
-  ```
-  <path-to-your-project>/wcm-aws-thing-sdk/software/tcpip/wcm-aws-iot-sdk/firmware/src/certs
-  ```
-- Convert the certificate and key by using the command `./gencertbuf.pl` in the directory.  This command will generate the certificates and key in byte arrays in a file called _certs.h_.
-
-  >There is already a root CA that is used to establish the SSL/TLS connection to the AWS IoT service.  This cert is in the proper DER format and will be converted along with your client cert and client private key.
-
 #### Programming the IoT Wi-Fi G AWS IoT Starter Kit
-To get your starter kit up and running, you will have to program the starter kit with your generated certificates.
+To get your starter kit up and running, you will have to program the starter kit .
 
 1.  Open MPLAB<sup>&reg;</sup> X IDE
 - Select __File -> Open Project__
@@ -149,7 +150,25 @@ To run the demo follow these instructions:
   > If a security type of _WEP_ or _WPA/WPA2_ is selected, a box will appear prompting for a password
 - Enter your AWS IoT Endpoint that you received from the previous AWS IoT Service Setup section
   - The endpoint will have the form `<random-string>.iot.us-east-1.amazonaws.com`
+- Copy and paste your client certificate into the box labeled Client Public Cert.
+  -  The cert should look like
+
+    ```
+    -----BEGIN CERTIFICATE-----
+    <cert data>
+    -----END CERTIFICATE-----
+    ```
+-  Copy and paste your private key into the box labeled Client Private Key.
+  -  The key should look like
+
+    ```
+    -----BEGIN RSA PRIVATE KEY----
+    <key data>
+    -----END RSA PRIVATE KEY-----
+    ```
 - Click the __Join__ button and a _Reconnection in Progress_ page will appear showing the network that the starter kit will reconnect to and your AWS IoT Endpoint.
+
+  >  NOTE:  The information you enter above will be sent in the clear and is not secured as if you where using https.  This feature will be added in the near future.
 
 You will see a series of LEDs flash until the board has connected to the AP you setup.  When the starter kit has connected you should see the D6 LED flickering with network traffic letting you know that you can read and set the state of the starter kit as described in the next section.  If not, please see the status and error code table below for more information.  For more detailed information please see the [Troubleshooting](#troubleshooting) section.
 

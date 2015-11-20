@@ -500,6 +500,16 @@ static HTTP_IO_RESULT HTTPPostWifiConfig(HTTP_CONN_HANDLE connHandle)
                 memcpy((uint8_t *)appData.aws_iot_host, (void*)(httpDataBuff+6), strlen((char*)(httpDataBuff+6)));
                 appData.aws_iot_host[strlen((char*)(httpDataBuff+6))] = 0; /* Terminate string */
             }
+            else if(!strcmp((char*)httpDataBuff, (const char*)"cc"))
+            {
+                memcpy((uint8_t *)appData.clientCert, (void*)(httpDataBuff+6), strlen((char*)(httpDataBuff+6)));
+                appData.clientCert[strlen((char*)(httpDataBuff+6))] = 0; /* Terminate string */
+            }
+            else if(!strcmp((char*)httpDataBuff, (const char*)"ck"))
+            {
+                memcpy((uint8_t *)appData.clientKey, (void*)(httpDataBuff+6), strlen((char*)(httpDataBuff+6)));
+                appData.clientKey[strlen((char*)(httpDataBuff+6))] = 0; /* Terminate string */
+            }
         }
 
         /* Check if WPA hasn't been selected with adhoc, if it has we choke! */
@@ -552,6 +562,8 @@ static HTTP_IO_RESULT HTTPPostWifiConfig(HTTP_CONN_HANDLE connHandle)
         WiFiAsyncSetEventPending(ASYNC_EASY_CONFIG_PENDING);
         
         DRV_WIFI_ConfigDataSave();
+        APP_NVM_Write(DRV_CLIENT_CERTIFICATE, (uint8_t *)appData.clientCert);
+        APP_NVM_Write(DRV_CLIENT_PRIVATE_KEY, (uint8_t *)appData.clientKey);
         
         BSP_LED_LightShowSet(BSP_LED_CONNECTING_TO_AP);
         

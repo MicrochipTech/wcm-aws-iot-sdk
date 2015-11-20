@@ -142,6 +142,10 @@ typedef struct
     NET_PRES_ADDRESS  aws_iot_ipv4test;
     char uuid[7];
     
+    // Cert and Key Locations
+    __attribute__ ((aligned(4))) char clientCert[2048];
+    __attribute__ ((aligned(4))) char clientKey[2048];
+    
     // Thing Data
     bool switch1;
     bool switch2;
@@ -263,6 +267,9 @@ void APP_Initialize ( void );
 
 void APP_Tasks( void );
 
+bool APP_NVM_Write(uint32_t nvm_dest_address, uint8_t * data);
+bool APP_NVM_Read(uint32_t nvm_dest_address, uint8_t * buffer, uint32_t bufferLength);
+bool APP_NVM_Erase(uint32_t nvm_dest_address);
 
 #endif /* _APP_H */
 

@@ -44,16 +44,16 @@ bool NET_PRES_CertStoreGetCACerts(const uint8_t ** certPtr, int32_t * certSize, 
     return true;
 }
 
-bool NET_PRES_CertStoreGetClientCerts(const uint8_t ** certPtr, int32_t * certSize, uint8_t certIndex)
-{
-    *certPtr = clientCert_der_2048;
-    *certSize = sizeof_clientCert_der_2048;
-    return true;
-}
-
-bool NET_PRES_CertStoreGetClientKey(const uint8_t ** certPtr, int32_t * certSize, uint8_t certIndex)
-{
-    *certPtr = clientKey_der_2048;
-    *certSize = sizeof_clientKey_der_2048;
-    return true;
-}
+//bool NET_PRES_CertStoreGetClientCerts(const uint8_t ** certPtr, int32_t * certSize, uint8_t certIndex)
+//{
+//    *certPtr = clientCert_der_2048;
+//    *certSize = sizeof_clientCert_der_2048;
+//    return true;
+//}
+//
+//bool NET_PRES_CertStoreGetClientKey(const uint8_t ** certPtr, int32_t * certSize, uint8_t certIndex)
+//{
+//    *certPtr = clientKey_der_2048;
+//    *certSize = sizeof_clientKey_der_2048;
+//    return true;
+//}

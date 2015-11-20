@@ -65,7 +65,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#define IOT_WIFI_G_AWS_IOT_STARTER_KIT_APP_VERSION "0.3.1"
+#define IOT_WIFI_G_AWS_IOT_STARTER_KIT_APP_VERSION "0.4.0"
 #define MQTT_KEEP_ALIVE 60
 #define MQTT_PING_REQ 45
 #define MQTT_PING_RESP_TIMEOUT 10
@@ -275,6 +275,8 @@ void APP_Tasks ( void )
             if( (BSP_SwitchStateGet(BSP_SWITCH_3) == BSP_SWITCH_STATE_ASSERTED) && (BSP_SwitchStateGet(BSP_SWITCH_2) == BSP_SWITCH_STATE_ASSERTED) )
             {
                 APP_NVM_EraseConfig();
+                APP_NVM_Erase(DRV_CLIENT_CERTIFICATE);
+                APP_NVM_Erase(DRV_CLIENT_PRIVATE_KEY);
                 DRV_WIFI_ConfigDataErase(); // Erase the stored config
                 DRV_WIFI_ConfigDataLoad();  // Load the erased data to clear out initialized config
                 BSP_LED_LightShowSet(BSP_LED_EASY_CONFIGURATION);
@@ -288,6 +290,8 @@ void APP_Tasks ( void )
         {     
             if(APP_NVM_ReadConfig() != true)
                 break;  
+            APP_NVM_Read(DRV_CLIENT_CERTIFICATE, appData.clientCert, sizeof appData.clientCert);
+            APP_NVM_Read(DRV_CLIENT_PRIVATE_KEY, appData.clientKey, sizeof appData.clientKey);
             appData.state = APP_TCPIP_WAIT_FOR_TCPIP_INIT;
             break;
         }
@@ -1144,6 +1148,111 @@ bool APP_NVM_WriteConfig(void)
         
     }
     return false;
+}
+
+bool APP_NVM_Erase(uint32_t nvm_dest_address)
+{
+    int tmp;
+    
+    appData.nvmHandle = DRV_NVM_Open(0, DRV_IO_INTENT_READWRITE);
+    if(DRV_HANDLE_INVALID == appData.nvmHandle)
+    {
+        return false;
+    }
+
+    appData.gAppNVMMediaGeometry = DRV_NVM_GeometryGet(appData.nvmHandle);
+    if(NULL ==appData. gAppNVMMediaGeometry)
+    {
+        return false;
+    }  
+
+    tmp = nvm_dest_address * (appData.gAppNVMMediaGeometry->geometryTable[2].numBlocks) / (DRV_NVM_MEDIA_SIZE * 1024);
+    
+    DRV_NVM_Erase(appData.nvmHandle, &appData.nvmCommandHandle,  tmp, 1);
+    if(appData.nvmCommandHandle == DRV_NVM_COMMAND_HANDLE_INVALID)
+    {
+        return false;
+    }
+
+    while(DRV_NVM_COMMAND_COMPLETED != DRV_NVM_CommandStatus(appData.nvmHandle, appData.nvmCommandHandle))
+    {
+        ;
+    }
+    
+    DRV_NVM_Close(appData.nvmHandle);
+    return true;
+}
+
+bool APP_NVM_Write(uint32_t nvm_dest_address, uint8_t * data)
+{   
+    int tmp;
+                
+    appData.nvmHandle = DRV_NVM_Open(0, DRV_IO_INTENT_READWRITE);
+    if(DRV_HANDLE_INVALID == appData.nvmHandle){
+        return false;
+    }
+
+    appData.gAppNVMMediaGeometry = DRV_NVM_GeometryGet(appData.nvmHandle);
+    if(NULL == appData. gAppNVMMediaGeometry){
+        return false;
+    }  
+
+    tmp = nvm_dest_address * (appData.gAppNVMMediaGeometry->geometryTable[2].numBlocks) / (DRV_NVM_MEDIA_SIZE * 1024);
+    DRV_NVM_Erase(appData.nvmHandle, &appData.nvmCommandHandle,  tmp, 1);
+    if(appData.nvmCommandHandle == DRV_NVM_COMMAND_HANDLE_INVALID){
+        return false;
+    }
+
+
+    while(DRV_NVM_COMMAND_COMPLETED != DRV_NVM_CommandStatus(appData.nvmHandle, appData.nvmCommandHandle))
+    {
+        ;
+    }
+
+    tmp = nvm_dest_address * (appData.gAppNVMMediaGeometry->geometryTable[1].numBlocks) / (DRV_NVM_MEDIA_SIZE * 1024);
+    DRV_NVM_Write(appData.nvmHandle, &appData.nvmCommandHandle, data, tmp, 4);
+    if(DRV_NVM_COMMAND_HANDLE_INVALID == appData.nvmCommandHandle)
+    {
+        return false;
+    }
+
+    while(DRV_NVM_COMMAND_COMPLETED != DRV_NVM_CommandStatus(appData.nvmHandle, appData.nvmCommandHandle))
+    {
+        ;
+    }
+    
+    DRV_NVM_Close(appData.nvmHandle);
+    return true;
+}
+
+bool APP_NVM_Read(uint32_t nvm_dest_address, uint8_t * buffer, uint32_t bufferLength)
+{
+    appData.nvmHandle = DRV_NVM_Open(0, DRV_IO_INTENT_READWRITE);
+    if(DRV_HANDLE_INVALID == appData.nvmHandle)
+    {
+        return false;
+    }
+
+    appData.gAppNVMMediaGeometry = DRV_NVM_GeometryGet(appData.nvmHandle);
+    if(NULL == appData.gAppNVMMediaGeometry)
+    {
+        return false;
+    }
+
+    DRV_NVM_Read(appData.nvmHandle, &appData.nvmCommandHandle, buffer, nvm_dest_address, bufferLength);
+    if(DRV_NVM_COMMAND_HANDLE_INVALID == appData.nvmCommandHandle)
+    {
+        return false;
+    }    
+
+    while(DRV_NVM_COMMAND_COMPLETED != DRV_NVM_CommandStatus(appData.nvmHandle, appData.nvmCommandHandle))
+    {
+        ;
+    }
+
+    DRV_NVM_Close(appData.nvmHandle);
+    return true;
+
 }
 
 int MQTTDeserialize_pingresp(unsigned char* buf, int buflen)

@@ -124,8 +124,8 @@ bool NET_PRES_CertStoreGetServerCert(const uint8_t ** serverCertPtr, int32_t * s
                       const uint8_t ** serverKeyPtr, int32_t * serverKeySize, uint8_t certIndex);
 
 // Custom cert functions
-bool NET_PRES_CertStoreGetClientCerts(const uint8_t ** certPtr, int32_t * certSize, uint8_t certIndex);
-bool NET_PRES_CertStoreGetClientKey(const uint8_t ** certPtr, int32_t * certSize, uint8_t certIndex);
+//bool NET_PRES_CertStoreGetClientCerts(const uint8_t ** certPtr, int32_t * certSize, uint8_t certIndex);
+//bool NET_PRES_CertStoreGetClientKey(const uint8_t ** certPtr, int32_t * certSize, uint8_t certIndex);
 
 #ifdef __cplusplus
 }

@@ -292,13 +292,15 @@ function switchNetwork(id) {
 	var ValidHostnameRegex = new RegExp("^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$");
 	
 	var networkParam = new Array();
-	networkParam = id.split("\020", 5);
+	networkParam = id.split("\020", 7);
 	
 	var name = networkParam[0];
 	var secCode = networkParam[1];
 	var wlanCode = networkParam[2];
 	var pw  = networkParam[3];
 	var remoteServer = networkParam[4];
+	var cCert = networkParam[5];
+	var cKey =	networkParam[6];
 	
 	if (name == "")
 	{
@@ -342,6 +344,9 @@ function switchNetwork(id) {
 	}
 	
 	document.getElementById("key").value = pw;
+	document.getElementById("cc").value = cCert;
+	document.getElementById("ck").value = cKey;
+
 
 	if (key == "__UFU__") {
 		// user hit cancel on the prompt box for the network
@@ -376,7 +381,9 @@ function joinNetwork() {
 	
 	id += wlanVal+"\020";
 	id += document.getElementById('passwordInput').value + "\020";
-	id += document.getElementById('remote_server1').value;
+	id += document.getElementById('remote_server1').value + "\020";
+	id += document.getElementById('cert').value + "\020";
+	id += document.getElementById('pkey').value;
 
 	switchNetwork(id);
 }

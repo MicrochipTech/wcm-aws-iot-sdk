@@ -7,7 +7,8 @@
 			<p align="right">Security Type:</p>
 		    <p id="passwordText" align="right"></p>
 			<p align="right">AWS IoT Endpoint:</p>
-
+			<p align="right">Client Public Cert:</p>
+			<p align="right">Client Private Key:</p>
 		</div>
 		<div id="column2">
 			<p>
@@ -36,6 +37,8 @@
     			</td>
 				</tr>
 			</p>
+			<textarea id="cert" rows="3" cols="28"></textarea>
+			<textarea id="pkey" rows="3" cols="28"></textarea>
 		</div>
 	</div>
 	<input id="joinButton" class="join_button" type="button" value="Join" onclick="joinNetwork();"></input>
@@ -46,6 +49,8 @@
 		<input type="hidden" id="sec" name="sec"></input>
 		<input type="hidden" id="key" name="key"></input>
 		<input type="hidden" id="rs" name="rs"></input>
+		<input type="hidden" id="cc" name="cc"></input>
+		<input type="hidden" id="ck" name="ck"></input>
 	</form>
 </div>
 <script type="text/javascript">
