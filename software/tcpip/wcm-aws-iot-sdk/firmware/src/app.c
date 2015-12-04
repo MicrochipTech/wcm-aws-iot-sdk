@@ -65,7 +65,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#define IOT_WIFI_G_AWS_IOT_STARTER_KIT_APP_VERSION "0.4.0"
+#define IOT_WIFI_G_AWS_IOT_STARTER_KIT_APP_VERSION "0.4.1"
 #define MQTT_KEEP_ALIVE 60
 #define MQTT_PING_REQ 45
 #define MQTT_PING_RESP_TIMEOUT 10
