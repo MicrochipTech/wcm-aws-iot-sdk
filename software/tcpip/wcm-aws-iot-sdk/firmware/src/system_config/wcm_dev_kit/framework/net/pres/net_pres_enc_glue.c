@@ -104,7 +104,7 @@ int NET_PRES_EncGlue_StreamClientSendCb0(void *sslin, char *buf, int sz, void *c
 bool NET_PRES_EncProviderStreamClientInit0(NET_PRES_TransportObject * transObject)
 {
     const uint8_t * caCertsPtr;
-    const uint8_t * clientCertPtr;
+//    const uint8_t * clientCertPtr;
 //    const uint8_t * clientKeyPtr;
     int32_t caCertsLen;
 //    int32_t clientCertLen;
@@ -165,7 +165,7 @@ bool NET_PRES_EncProviderStreamClientInit0(NET_PRES_TransportObject * transObjec
 //    }
     
         // Loading the private key for client authentication use
-    if(wolfSSL_CTX_use_PrivateKey_buffer(net_pres_wolfSSLInfoStreamClient0.context, appData.clientKey, strlen(appData.clientKey), SSL_FILETYPE_PEM) != SSL_SUCCESS)
+    if(wolfSSL_CTX_use_PrivateKey_buffer(net_pres_wolfSSLInfoStreamClient0.context, appData.clientKey, strlen((char *)appData.clientKey), SSL_FILETYPE_PEM) != SSL_SUCCESS)
     {
         // Couldn't load the private key
         //SYS_CONSOLE_MESSAGE("Something went wrong loading the private key\r\n");
@@ -174,7 +174,7 @@ bool NET_PRES_EncProviderStreamClientInit0(NET_PRES_TransportObject * transObjec
     }
     
     // Loading the client cert so that the server can authenticate us (client authentication))
-    if(wolfSSL_CTX_use_certificate_buffer(net_pres_wolfSSLInfoStreamClient0.context, appData.clientCert, strlen(appData.clientCert), SSL_FILETYPE_PEM) != SSL_SUCCESS)
+    if(wolfSSL_CTX_use_certificate_buffer(net_pres_wolfSSLInfoStreamClient0.context, appData.clientCert, strlen((char *)appData.clientCert), SSL_FILETYPE_PEM) != SSL_SUCCESS)
     {
         // Couldn't load the client certificate
         //SYS_CONSOLE_MESSAGE("Something went wrong loading the client certificate\r\n");

@@ -40,6 +40,7 @@
         <itemPath>../src/bsp_config.h</itemPath>
         <itemPath>../src/queue.h</itemPath>
         <itemPath>../src/parson.h</itemPath>
+        <itemPath>../src/app_nvm_support.h</itemPath>
       </logicalFolder>
       <logicalFolder name="certs" displayName="certs" projectFiles="true">
         <itemPath>../src/certs/certs.h</itemPath>
@@ -327,6 +328,7 @@
         <itemPath>../src/mpfs_img2.c</itemPath>
         <itemPath>../src/http_print.c</itemPath>
         <itemPath>../src/custom_http_app.c</itemPath>
+        <itemPath>../src/app_nvm_support.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="crypto" projectFiles="true">
@@ -545,6 +547,7 @@
     <Elem>../../../../../../microchip/harmony/v1_06</Elem>
     <Elem>../src/system_config/wcm_dev_kit</Elem>
     <Elem>../../../../../microchip/harmony/v1_06/framework/tcpip/src</Elem>
+    <Elem>../../../../../microchip/harmony/v1_06/framework/system/ports/src</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -562,7 +565,6 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>../../../../../microchip/harmony/v1_06/bin/framework/peripheral/PIC32MX695F512H_peripherals.a</linkerLibFileItem>
             <linkerLibFileItem>../../../../../microchip/harmony/v1_06/bin/framework/peripheral/PIC32MX695F512H_peripherals.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>

@@ -5,20 +5,16 @@
 ### Introduction
 AWS has introduced a new service that will allow internet of things (IoT) devices to be easily and securely connected to their new [AWS IoT](http://aws.amazon.com/iot/) service.
 
-#### Notes About This Version
-This version of the software is being released as a __beta__ version.  Please check back often as there will be many updates to this starter kit.  This version of the starter kit has been based on our [WCM (Wi-Fi Client Module) Development Kit 1](http://www.microchipdirect.com/ProductSearch.aspx?keywords=DM182020).  If you already have one of these kits you can use it for running the demo listed below.
-
 #### Microchip Required Tools and Applications
 You will need the following Microchip development tools to run the following out of box demo
 
 - Order the [IoT Wi-Fi G AWS IoT Starter Kit](http://www.microchipdirect.com/productsearch.aspx?Keywords=DM990001) from Microchip Direct.  This starter kit includes PICKit&trade; 3 In-Circuit Debugger/Programmer
-  >NOTE: If this tool is not available you can order the WCM (Wi-Fi Client Module) Development Kit 1 above and the PICKit&trade; 3 In-Circuit Debugger/Programmer from Microchip Direct
 
 - Download and install Microchip MPLAB<sup>&reg;</sup>X IDE for your OS from here:
 [Microchip MPLAB<sup>&reg;</sup> X IDE](http://www.microchip.com/mplabx)
 
 - Download and install the latest XC32 compiler for your OS from here: [Microchip MPLAB<sup>&reg;</sup> XC32 Compiler](http://www.microchip.com/xc32)
-  >NOTE: MPLAB<sup>&reg;</sup> XC Compiler licenses are also available as Free editions and have the option of a 60-day PRO evaluation trial.  This will be required as the source code requires optimizations to be turned on.
+  >NOTE: MPLAB<sup>&reg;</sup> XC Compiler licenses are available as Free editions and have the option of a 60-day PRO evaluation trial.  The PRO version will be required as the source code requires optimizations to be turned on.  There is also a monthly subscription option available.
 
 #### AWS Required Applications
 To use the AWS IoT services you will need to make use of _AWS Command Line Interface_ (awscli) tool.  For more information on how to install, configure, and use the awscli tool please go to [AWS Command Line Interface User Guide](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html).
@@ -51,7 +47,7 @@ This assumes that you have not installed previous version of Python, awscli, or 
   ```
   pip install --upgrade awscli
   ```
-- To verify the version of the AWS CLI tool installed run the following command and look for version 1.8.12 or greater:
+- To verify the version of the AWS CLI tool installed run the following command and look for version 1.9.x or greater:
 
   ```
   aws --version
@@ -168,7 +164,7 @@ To run the demo follow these instructions:
     ```
 - Click the __Join__ button and a _Reconnection in Progress_ page will appear showing the network that the starter kit will reconnect to and your AWS IoT Endpoint.
 
-  >  NOTE:  The information you enter above will be sent in the clear and is not secured as if you where using https.  This feature will be added in the near future.
+  >  NOTE:  The information you enter above will be sent in the clear and is not secured as if you where using https.
 
 You will see a series of LEDs flash until the board has connected to the AP you setup.  When the starter kit has connected you should see the D6 LED flickering with network traffic letting you know that you can read and set the state of the starter kit as described in the next section.  If not, please see the status and error code table below for more information.  For more detailed information please see the [Troubleshooting](#troubleshooting) section.
 

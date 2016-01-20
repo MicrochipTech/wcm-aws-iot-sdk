@@ -587,11 +587,12 @@ void SYS_Initialize ( void* data )
     SYS_INT_Enable();
     sysObj.netPres = NET_PRES_Initialize(0, (SYS_MODULE_INIT*)&netPresInitData);
 
+        /* initialize the Board */
+    BSP_Initialize();
+    
     /* Initialize the Application */
     APP_Initialize();
-    
-    /* initialize the Board */
-    BSP_Initialize();
+   
 }
 
 

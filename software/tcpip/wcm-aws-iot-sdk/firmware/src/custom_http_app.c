@@ -44,6 +44,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "tcpip/src/common/hashes.h"
 #include "tcpip/src/common/helpers.h"
 
+#include "ctype.h"
+
 #include "tcpip/src/tcpip_private.h"
 #include "driver/wifi/mrf24w/src/drv_wifi_easy_config.h"
 #include "app.h"
