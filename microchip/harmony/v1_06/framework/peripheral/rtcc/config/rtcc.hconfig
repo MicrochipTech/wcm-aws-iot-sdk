@@ -1,1 +1,0 @@
-source "$HARMONY_VERSION_PATH/framework/peripheral/rtcc/processor/rtcc_$DEVICE.hconfig"

@@ -1,1 +1,0 @@
-source "$HARMONY_VERSION_PATH/framework/peripheral/nvm/processor/nvm_$DEVICE.hconfig"
